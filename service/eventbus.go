@@ -68,7 +68,7 @@ func (e *EventBus) handleCreateAccount(d amqp.Delivery) error {
 		return nil
 	}
 
-	_, err = e.ds.Account.Create(req.OwnerID, req.Type, e.secret)
+	_, err = e.ds.Account.Create(req.OwnerID, e.secret)
 	if err != nil {
 		e.logger.Errorf("failed to create account: %s", err)
 		return nil

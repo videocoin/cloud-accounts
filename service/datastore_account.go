@@ -22,36 +22,8 @@ func NewAccountDatastore(db *gorm.DB) (*AccountDatastore, error) {
 	return &AccountDatastore{db: db}, nil
 }
 
-func (ds *AccountDatastore) GetList() ([]*v1.Account, error) {
-	accounts := []*v1.Account{}
-
-	err := ds.db.Find(&accounts).Error
-	if err != nil {
-		return nil, fmt.Errorf("failed to get accounts list: %s", err)
-	}
-
-	return accounts, nil
-}
-
-func (ds *AccountDatastore) GetByID(id string) ([]*v1.Account, error) {
-	accounts := []*v1.Account{}
-
-	err := ds.db.Where("user_id = ?", id).Find(&accounts).Error
-	if err != nil {
-		if err == gorm.ErrRecordNotFound {
-			return nil, ErrAccountNotFound
-		}
-
-		return nil, fmt.Errorf("failed to get Account by id: %s", err.Error())
-	}
-
-	return accounts, nil
-}
-
-func (ds *AccountDatastore) Create(userID string, accountType v1.AccountType, passphrase string) (*v1.Account, error) {
+func (ds *AccountDatastore) Create(userID string, passphrase string) (*v1.Account, error) {
 	tx := ds.db.Begin()
-
-	account := &v1.Account{}
 
 	id, err := uuid4.New()
 	if err != nil {
@@ -65,12 +37,11 @@ func (ds *AccountDatastore) Create(userID string, accountType v1.AccountType, pa
 		return nil, err
 	}
 
-	account = &v1.Account{
+	account := &v1.Account{
 		Id:      id,
 		UserId:  userID,
 		Address: key.Address,
 		Key:     key.KeyFile,
-		Type:    accountType,
 	}
 
 	err = tx.Create(account).Error
@@ -82,4 +53,30 @@ func (ds *AccountDatastore) Create(userID string, accountType v1.AccountType, pa
 	tx.Commit()
 
 	return account, nil
+}
+
+func (ds *AccountDatastore) Get(userID string) ([]*v1.Account, error) {
+	accounts := []*v1.Account{}
+
+	err := ds.db.Where("user_id = ?", userID).Find(&accounts).Error
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return nil, ErrAccountNotFound
+		}
+
+		return nil, fmt.Errorf("failed to get Account by id: %s", err.Error())
+	}
+
+	return accounts, nil
+}
+
+func (ds *AccountDatastore) GetList() ([]*v1.Account, error) {
+	accounts := []*v1.Account{}
+
+	err := ds.db.Find(&accounts).Error
+	if err != nil {
+		return nil, fmt.Errorf("failed to get accounts list: %s", err)
+	}
+
+	return accounts, nil
 }

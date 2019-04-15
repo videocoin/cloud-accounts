@@ -4,8 +4,14 @@ github.com/VideoCoin/cloud-api v0.0.0-20190411215626-803742beca5b h1:5eBWgrQTsWd
 github.com/VideoCoin/cloud-api v0.0.0-20190411215626-803742beca5b/go.mod h1:svS5JmEBp6fgHMaQwLf+Hn+K8Q7lQP3HpkNiHZctrUw=
 github.com/VideoCoin/cloud-api v0.0.0-20190412171730-b434bd6c6bd9 h1:B0fZCRbpOkF2OYtDh1oRox+RpF1Lm9ZR1493TvcP6To=
 github.com/VideoCoin/cloud-api v0.0.0-20190412171730-b434bd6c6bd9/go.mod h1:BfO7vo1wOuXAFn5PdxKjgbvyAoa2ERilXVzMc04NB34=
+github.com/VideoCoin/cloud-api v0.0.0-20190414201014-44b14fef4432 h1:bIBHjGoVtAESFckME28w8g1dGxZ0ejA+j/iVbFqh9bc=
+github.com/VideoCoin/cloud-api v0.0.0-20190414201014-44b14fef4432/go.mod h1:BfO7vo1wOuXAFn5PdxKjgbvyAoa2ERilXVzMc04NB34=
+github.com/VideoCoin/cloud-api v0.0.0-20190415043406-de7388d1f113 h1:hHUEx9rbroDgPgYIWlJwF80hHp9tQGRk60ashszWkAU=
+github.com/VideoCoin/cloud-api v0.0.0-20190415043406-de7388d1f113/go.mod h1:BfO7vo1wOuXAFn5PdxKjgbvyAoa2ERilXVzMc04NB34=
 github.com/VideoCoin/cloud-pkg v0.0.0-20190410195939-9b8c822a17e7 h1:fCizXhRaQFUJImQsnR0lpV+N6b116H0vxDbEEO3M4IA=
 github.com/VideoCoin/cloud-pkg v0.0.0-20190410195939-9b8c822a17e7/go.mod h1:Vks3HtLx+ETgxZzyb9FiD9lanDRnbhLFhPZc68TKpbY=
+github.com/VideoCoin/cloud-pkg v0.0.0-20190414194354-81fc89d29c9d h1:TTqyIQlDiSn6PxijT0WzNIaagILpLpU1IIIYCT2ULCE=
+github.com/VideoCoin/cloud-pkg v0.0.0-20190414194354-81fc89d29c9d/go.mod h1:Vks3HtLx+ETgxZzyb9FiD9lanDRnbhLFhPZc68TKpbY=
 github.com/VideoCoin/go-videocoin v0.0.0-20190401175528-dcf3542feb8e h1:fw2uUslZgPcVVKouMUFaSDbHTGh/q5To95lzGgWcpYQ=
 github.com/VideoCoin/go-videocoin v0.0.0-20190401175528-dcf3542feb8e/go.mod h1:aW3yLffGv7TP/5LOg4ihjmyXAG1ABatIoS36yRprbQk=
 github.com/aead/siphash v1.0.1/go.mod h1:Nywa3cDsYNNK3gaciGTWPwHt0wlpNV15vwmswBAUSII=
@@ -31,6 +37,8 @@ github.com/davecgh/go-spew v0.0.0-20171005155431-ecdeabc65495/go.mod h1:J7Y8YcW2
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/deckarep/golang-set v1.7.1 h1:SCQV0S6gTtp6itiFrTqI+pfmJ4LN85S1YzhDf9rTHJQ=
 github.com/deckarep/golang-set v1.7.1/go.mod h1:93vsz/8Wt4joVM7c2AVqh+YRMiUSc14yDtF28KmMOgQ=
+github.com/dgrijalva/jwt-go v3.2.0+incompatible h1:7qlOGliEKZXTDg6OTjfoBKDXWrumCAMpl/TFQ4/5kLM=
+github.com/dgrijalva/jwt-go v3.2.0+incompatible/go.mod h1:E3ru+11k8xSBh+hMPgOLZmtrrCbhqsmaPHjLKYnJCaQ=
 github.com/envoyproxy/go-control-plane v0.6.9/go.mod h1:SBwIajubJHhxtWwsL9s8ss4safvEdbitLhGGK48rN6g=
 github.com/evalphobia/logrus_sentry v0.8.2 h1:dotxHq+YLZsT1Bb45bB5UQbfCh3gM/nFFetyN46VoDQ=
 github.com/evalphobia/logrus_sentry v0.8.2/go.mod h1:pKcp+vriitUqu9KiWj/VRFbRfFNUwz95/UkgG8a6MNc=
