@@ -57,7 +57,7 @@ func (e *EventBus) registerConsumers() error {
 }
 
 func (e *EventBus) handleCreateAccount(d amqp.Delivery) error {
-	req := new(v1.CreateAccountRequest)
+	req := new(v1.AccountRequest)
 	err := json.Unmarshal(d.Body, req)
 	if err != nil {
 		return err

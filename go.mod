@@ -3,7 +3,7 @@ module github.com/VideoCoin/cloud-accounts
 go 1.12
 
 require (
-	github.com/VideoCoin/cloud-api v0.0.0-20190415043406-de7388d1f113
+	github.com/VideoCoin/cloud-api v0.0.0-20190418013214-e2b5ac7db397
 	github.com/VideoCoin/cloud-pkg v0.0.0-20190414194354-81fc89d29c9d
 	github.com/VideoCoin/go-videocoin v0.0.0-20190401175528-dcf3542feb8e
 	github.com/allegro/bigcache v1.2.0 // indirect
@@ -12,6 +12,7 @@ require (
 	github.com/certifi/gocertifi v0.0.0-20190410005359-59a85de7f35e // indirect
 	github.com/deckarep/golang-set v1.7.1 // indirect
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible // indirect
+	github.com/envoyproxy/protoc-gen-validate v0.0.14 // indirect
 	github.com/evalphobia/logrus_sentry v0.8.2 // indirect
 	github.com/getsentry/raven-go v0.2.0 // indirect
 	github.com/go-sql-driver/mysql v1.4.1 // indirect

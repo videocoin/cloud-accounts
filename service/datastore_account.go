@@ -55,22 +55,37 @@ func (ds *AccountDatastore) Create(userID string, passphrase string) (*v1.Accoun
 	return account, nil
 }
 
-func (ds *AccountDatastore) Get(userID string) ([]*v1.Account, error) {
-	accounts := []*v1.Account{}
+func (ds *AccountDatastore) Get(userID string) (*v1.Account, error) {
+	account := new(v1.Account)
 
-	err := ds.db.Where("user_id = ?", userID).Find(&accounts).Error
+	err := ds.db.Where("user_id = ?", userID).First(&account).Error
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return nil, ErrAccountNotFound
 		}
 
-		return nil, fmt.Errorf("failed to get Account by id: %s", err.Error())
+		return nil, fmt.Errorf("failed to get account by id: %s", err.Error())
 	}
 
-	return accounts, nil
+	return account, nil
 }
 
-func (ds *AccountDatastore) GetList() ([]*v1.Account, error) {
+func (ds *AccountDatastore) GetByAddress(address string) (*v1.Account, error) {
+	account := new(v1.Account)
+
+	err := ds.db.Where("address = ?", address).First(&account).Error
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return nil, ErrAccountNotFound
+		}
+
+		return nil, fmt.Errorf("failed to get account by id: %s", err.Error())
+	}
+
+	return account, nil
+}
+
+func (ds *AccountDatastore) List() ([]*v1.Account, error) {
 	accounts := []*v1.Account{}
 
 	err := ds.db.Find(&accounts).Error

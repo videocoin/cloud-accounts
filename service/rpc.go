@@ -6,7 +6,6 @@ import (
 
 	v1 "github.com/VideoCoin/cloud-api/accounts/v1"
 	"github.com/VideoCoin/cloud-api/rpc"
-	"github.com/VideoCoin/cloud-pkg/auth"
 	"github.com/VideoCoin/cloud-pkg/grpcutil"
 	protoempty "github.com/golang/protobuf/ptypes/empty"
 	"github.com/jinzhu/copier"
@@ -67,7 +66,7 @@ func (s *RpcServer) Health(ctx context.Context, req *protoempty.Empty) (*rpc.Hea
 	return &rpc.HealthStatus{Status: "OK"}, nil
 }
 
-func (s *RpcServer) Create(ctx context.Context, req *v1.CreateAccountRequest) (*v1.AccountProfile, error) {
+func (s *RpcServer) Create(ctx context.Context, req *v1.AccountRequest) (*v1.AccountProfile, error) {
 	account, err := s.ds.Account.Create(req.OwnerID, s.secret)
 	if err != nil {
 		s.logger.Error(err)
@@ -75,23 +74,57 @@ func (s *RpcServer) Create(ctx context.Context, req *v1.CreateAccountRequest) (*
 	}
 
 	accountProfile := new(v1.AccountProfile)
-	copier.Copy(accountProfile, account)
+	err = copier.Copy(accountProfile, account)
+	if err != nil {
+		return nil, rpc.ErrRpcInternal
+	}
 
 	return accountProfile, nil
 }
 
-func (s *RpcServer) Get(ctx context.Context, req *protoempty.Empty) (*v1.AccountProfile, error) {
-	ctx, err := auth.AuthFromContext(ctx)
+func (s *RpcServer) List(ctx context.Context, req *protoempty.Empty) (*v1.ListResponse, error) {
+	accounts, err := s.ds.Account.List()
 	if err != nil {
-		return nil, rpc.ErrRpcUnauthenticated
+		s.logger.Error(err)
+		return nil, err
 	}
 
-	userID, ok := auth.UserIDFromContext(ctx)
-	if !ok {
-		return nil, rpc.ErrRpcUnauthenticated
+	accountProfiles := make([]*v1.AccountProfile, 0)
+	err = copier.Copy(&accountProfiles, &accounts)
+	if err != nil {
+		return nil, rpc.ErrRpcInternal
 	}
 
-	account, err := s.ds.Account.Get(userID)
+	return &v1.ListResponse{
+		Items: accountProfiles,
+	}, nil
+}
+
+func (s *RpcServer) Key(ctx context.Context, req *v1.AccountRequest) (*v1.AccountKey, error) {
+	account, err := s.ds.Account.Get(req.OwnerID)
+	if err != nil {
+		s.logger.Error(err)
+		return nil, rpc.ErrRpcInternal
+	}
+
+	accountKey := new(v1.AccountKey)
+	err = copier.Copy(accountKey, account)
+	if err != nil {
+		s.logger.Error(err)
+		return nil, rpc.ErrRpcInternal
+	}
+
+	return accountKey, nil
+}
+
+func (s *RpcServer) Get(ctx context.Context, req *v1.AccountRequest) (*v1.AccountProfile, error) {
+	err := req.Validate()
+	if err != nil {
+		s.logger.Error(err)
+		return nil, err
+	}
+
+	account, err := s.ds.Account.Get(req.OwnerID)
 	if err != nil {
 		s.logger.Error(err)
 		return nil, rpc.ErrRpcInternal
@@ -107,18 +140,37 @@ func (s *RpcServer) Get(ctx context.Context, req *protoempty.Empty) (*v1.Account
 	return accountProfile, nil
 }
 
-func (s *RpcServer) Refresh(ctx context.Context, req *protoempty.Empty) (*v1.AccountProfile, error) {
-	ctx, err := auth.AuthFromContext(ctx)
+func (s *RpcServer) GetByAddress(ctx context.Context, req *v1.Address) (*v1.AccountProfile, error) {
+	err := req.Validate()
 	if err != nil {
-		return nil, rpc.ErrRpcUnauthenticated
+		s.logger.Error(err)
+		return nil, err
 	}
 
-	userID, ok := auth.UserIDFromContext(ctx)
-	if !ok {
-		return nil, rpc.ErrRpcUnauthenticated
+	account, err := s.ds.Account.GetByAddress(req.Address)
+	if err != nil {
+		s.logger.Error(err)
+		return nil, err
 	}
 
-	account, err := s.ds.Account.Get(userID)
+	accountProfile := new(v1.AccountProfile)
+	err = copier.Copy(accountProfile, account)
+	if err != nil {
+		s.logger.Error(err)
+		return nil, rpc.ErrRpcInternal
+	}
+
+	return accountProfile, nil
+}
+
+func (s *RpcServer) Refresh(ctx context.Context, req *v1.AccountRequest) (*v1.AccountProfile, error) {
+	err := req.Validate()
+	if err != nil {
+		s.logger.Error(err)
+		return nil, err
+	}
+
+	account, err := s.ds.Account.Get(req.OwnerID)
 	if err != nil {
 		s.logger.Error(err)
 		return nil, rpc.ErrRpcInternal
