@@ -12,7 +12,7 @@ import (
 )
 
 var (
-	ServiceName string = "vc_accounts"
+	ServiceName string = "accounts"
 	Version     string = "dev"
 )
 

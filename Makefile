@@ -1,12 +1,12 @@
 GOOS?=linux
 GOARCH?=amd64
 
-export CGO_ENABLED=1
+GCP_PROJECT=videocoin-network
 
-NAME=vc_accounts
+NAME=accounts
 VERSION=$$(git describe --abbrev=0)-$$(git rev-parse --short HEAD)
 
-DBM_MSQLURI=host=127.0.0.1 user=mysql dbname=videocoin sslmode=disable password=mysql
+DBM_MSQLURI=root:@tcp(127.0.0.1:3306)/videocoin?charset=utf8&parseTime=True&loc=Local
 
 version:
 	@echo ${VERSION}
@@ -38,12 +38,12 @@ docker-push:
 	gcloud docker -- push gcr.io/${GCP_PROJECT}/${NAME}:${VERSION}
 
 dbm-status:
-	goose -dir migrations -table ${NAME} postgres "${DBM_MSQLURI}" status
+	goose -dir migrations -table ${NAME} mysql "${DBM_MSQLURI}" status
 
 dbm-up:
-	goose -dir migrations -table ${NAME} postgres "${DBM_MSQLURI}" up
+	goose -dir migrations -table ${NAME} mysql "${DBM_MSQLURI}" up
 
 dbm-down:
-	goose -dir migrations -table ${NAME} postgres "${DBM_MSQLURI}" down
+	goose -dir migrations -table ${NAME} mysql "${DBM_MSQLURI}" down
 
-release: build docker-build docker-push
+release: docker-build docker-push
