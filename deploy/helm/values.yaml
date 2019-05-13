@@ -22,10 +22,10 @@ autoscaler:
 resources:
   limits:
    cpu: 200m
-   memory: 200Mi
+   memory: 1000Mi
   requests:
    cpu: 200m
-   memory: 200Mi
+   memory: 1000Mi
 
 secrets:
   dbUri: ""
