@@ -3,7 +3,9 @@ package service
 import (
 	"errors"
 	"fmt"
+	"time"
 
+	"github.com/AlekSi/pointer"
 	v1 "github.com/VideoCoin/cloud-api/accounts/v1"
 	"github.com/VideoCoin/cloud-pkg/uuid4"
 	"github.com/jinzhu/gorm"
@@ -31,7 +33,7 @@ func (ds *AccountDatastore) Create(userID string, passphrase string) (*v1.Accoun
 		return nil, err
 	}
 
-	key, err := GenerateKey(passphrase)
+	key, err := generateKey(passphrase)
 	if err != nil {
 		tx.Rollback()
 		return nil, err
@@ -94,4 +96,21 @@ func (ds *AccountDatastore) List() ([]*v1.Account, error) {
 	}
 
 	return accounts, nil
+}
+
+func (ds *AccountDatastore) UpdateBalance(account *v1.Account, balance float64) error {
+	account.Balance = balance
+	account.UpdateAt = pointer.ToTime(time.Now())
+
+	updates := map[string]interface{}{
+		"balance":   account.Balance,
+		"updatedAt": account.UpdateAt,
+	}
+
+	err := ds.db.Model(account).Updates(updates).Error
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

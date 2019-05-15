@@ -2,11 +2,14 @@ package service
 
 import (
 	"context"
+	"fmt"
 	"net"
 
 	v1 "github.com/VideoCoin/cloud-api/accounts/v1"
 	"github.com/VideoCoin/cloud-api/rpc"
 	"github.com/VideoCoin/cloud-pkg/grpcutil"
+	"github.com/VideoCoin/go-videocoin/common"
+	"github.com/VideoCoin/go-videocoin/ethclient"
 	protoempty "github.com/golang/protobuf/ptypes/empty"
 	"github.com/jinzhu/copier"
 	"github.com/sirupsen/logrus"
@@ -15,11 +18,12 @@ import (
 )
 
 type RpcServerOptions struct {
-	Addr   string
-	Secret string
-	Logger *logrus.Entry
-	DS     *Datastore
-	EB     *EventBus
+	Addr         string
+	NodeHTTPAddr string
+	Secret       string
+	Logger       *logrus.Entry
+	DS           *Datastore
+	EB           *EventBus
 }
 
 type RpcServer struct {
@@ -30,6 +34,7 @@ type RpcServer struct {
 	logger *logrus.Entry
 	ds     *Datastore
 	eb     *EventBus
+	ec     *ethclient.Client
 }
 
 func NewRpcServer(opts *RpcServerOptions) (*RpcServer, error) {
@@ -41,6 +46,11 @@ func NewRpcServer(opts *RpcServerOptions) (*RpcServer, error) {
 		return nil, err
 	}
 
+	ethClient, err := ethclient.Dial(opts.NodeHTTPAddr)
+	if err != nil {
+		return nil, fmt.Errorf("failed to dial eth client: %s", err.Error())
+	}
+
 	rpcServer := &RpcServer{
 		addr:   opts.Addr,
 		secret: opts.Secret,
@@ -49,6 +59,7 @@ func NewRpcServer(opts *RpcServerOptions) (*RpcServer, error) {
 		logger: opts.Logger,
 		ds:     opts.DS,
 		eb:     opts.EB,
+		ec:     ethClient,
 	}
 
 	v1.RegisterAccountServiceServer(grpcServer, rpcServer)
@@ -171,6 +182,25 @@ func (s *RpcServer) Refresh(ctx context.Context, req *v1.AccountRequest) (*v1.Ac
 	}
 
 	account, err := s.ds.Account.Get(req.OwnerID)
+	if err != nil {
+		s.logger.Error(err)
+		return nil, rpc.ErrRpcInternal
+	}
+
+	address := common.HexToAddress(account.Address)
+	balanceWei, err := s.ec.BalanceAt(context.Background(), address, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	balanceVdc, err := wei2Vdc(balanceWei)
+	if err != nil {
+		s.logger.Error(err)
+		return nil, rpc.ErrRpcInternal
+	}
+
+	balance, _ := balanceVdc.Float64()
+	err = s.ds.Account.UpdateBalance(account, balance)
 	if err != nil {
 		s.logger.Error(err)
 		return nil, rpc.ErrRpcInternal

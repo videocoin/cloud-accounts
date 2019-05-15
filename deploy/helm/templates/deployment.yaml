@@ -24,8 +24,13 @@ spec:
           ports:
             - containerPort: {{ .Values.service.internalRpcPort }}
           env:
-            - name: VC_ACCOUNTS_RPCADDR
+            - name: ACCOUNTS_RPCADDR
               value: 0.0.0.0:{{ .Values.service.internalRpcPort }}
+            - name: ACCOUNTS_NODEHTTPADDR
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Chart.Name }}
+                  key: nodeHttpAddr
             - name: DBURI
               valueFrom:
                 secretKeyRef:
@@ -36,7 +41,7 @@ spec:
                 secretKeyRef:
                   name: {{ .Chart.Name }}
                   key: mqUri
-            - name: VC_ACCOUNTS_SECRET
+            - name: ACCOUNTS_SECRET
               valueFrom:
                 secretKeyRef:
                   name: {{ .Chart.Name }}

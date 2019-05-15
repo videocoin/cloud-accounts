@@ -28,6 +28,7 @@ resources:
    memory: 1000Mi
 
 secrets:
+  nodeHttpAddr: ""
   dbUri: ""
   mqUri: ""
   secret: ""

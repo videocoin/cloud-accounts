@@ -2,6 +2,7 @@ package service
 
 import (
 	"crypto/rand"
+	"math/big"
 
 	"github.com/VideoCoin/go-videocoin/accounts/keystore"
 )
@@ -11,7 +12,7 @@ type Key struct {
 	KeyFile string
 }
 
-func GenerateKey(passphrase string) (*Key, error) {
+func generateKey(passphrase string) (*Key, error) {
 	key := keystore.NewKeyForDirectICAP(rand.Reader)
 
 	json, err := keystore.EncryptKey(key, passphrase, keystore.StandardScryptN, keystore.StandardScryptP)
@@ -23,4 +24,13 @@ func GenerateKey(passphrase string) (*Key, error) {
 		Address: key.Address.String(),
 		KeyFile: string(json),
 	}, nil
+}
+
+func wei2Vdc(wei *big.Int) (*big.Float, error) {
+	var factor, exp = big.NewInt(18), big.NewInt(10)
+	exp = exp.Exp(exp, factor, nil)
+
+	fwei := new(big.Float).SetInt(wei)
+
+	return new(big.Float).Quo(fwei, new(big.Float).SetInt(exp)), nil
 }

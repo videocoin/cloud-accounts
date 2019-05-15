@@ -3,7 +3,7 @@ module github.com/VideoCoin/cloud-accounts
 go 1.12
 
 require (
-	github.com/VideoCoin/cloud-api v0.0.0-20190418013214-e2b5ac7db397
+	github.com/VideoCoin/cloud-api v0.0.0-20190515042944-b7ed11f97401
 	github.com/VideoCoin/cloud-pkg v0.0.0-20190414194354-81fc89d29c9d
 	github.com/VideoCoin/go-videocoin v0.0.0-20190401175528-dcf3542feb8e
 	github.com/allegro/bigcache v1.2.0 // indirect
@@ -30,8 +30,10 @@ require (
 	github.com/pkg/errors v0.8.1 // indirect
 	github.com/prometheus/client_golang v0.9.2 // indirect
 	github.com/rjeczalik/notify v0.9.2 // indirect
+	github.com/rs/cors v1.6.0 // indirect
 	github.com/sirupsen/logrus v1.4.1
 	github.com/streadway/amqp v0.0.0-20190404075320-75d898a42a94
 	github.com/syndtr/goleveldb v1.0.0 // indirect
 	google.golang.org/grpc v1.20.0
+	gopkg.in/natefinch/npipe.v2 v2.0.0-20160621034901-c1b8fa8bdcce // indirect
 )
