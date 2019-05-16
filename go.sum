@@ -1,4 +1,6 @@
 cloud.google.com/go v0.26.0/go.mod h1:aQUYkXzVsufM+DwF1aE+0xfcU+56JwCaLick0ClmMTw=
+github.com/AlekSi/pointer v1.0.0 h1:KWCWzsvFxNLcmM5XmiqHsGTTsuwZMsLFwWF9Y+//bNE=
+github.com/AlekSi/pointer v1.0.0/go.mod h1:1kjywbfcPFCmncIxtk6fIEub6LKrfMz3gc5QKVOSOA8=
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
 github.com/VideoCoin/cloud-api v0.0.0-20190411215626-803742beca5b h1:5eBWgrQTsWdO9dQy6sK06BNyyygEVNPgs9xWPZk2HLI=
 github.com/VideoCoin/cloud-api v0.0.0-20190411215626-803742beca5b/go.mod h1:svS5JmEBp6fgHMaQwLf+Hn+K8Q7lQP3HpkNiHZctrUw=

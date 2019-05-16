@@ -100,11 +100,11 @@ func (ds *AccountDatastore) List() ([]*v1.Account, error) {
 
 func (ds *AccountDatastore) UpdateBalance(account *v1.Account, balance float64) error {
 	account.Balance = balance
-	account.UpdateAt = pointer.ToTime(time.Now())
+	account.UpdatedAt = pointer.ToTime(time.Now())
 
 	updates := map[string]interface{}{
 		"balance":   account.Balance,
-		"updatedAt": account.UpdateAt,
+		"updatedAt": account.UpdatedAt,
 	}
 
 	err := ds.db.Model(account).Updates(updates).Error

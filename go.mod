@@ -3,6 +3,7 @@ module github.com/VideoCoin/cloud-accounts
 go 1.12
 
 require (
+	github.com/AlekSi/pointer v1.0.0
 	github.com/VideoCoin/cloud-api v0.0.0-20190515042944-b7ed11f97401
 	github.com/VideoCoin/cloud-pkg v0.0.0-20190414194354-81fc89d29c9d
 	github.com/VideoCoin/go-videocoin v0.0.0-20190401175528-dcf3542feb8e
