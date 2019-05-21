@@ -63,12 +63,12 @@ func (e *EventBus) handleCreateAccount(d amqp.Delivery) error {
 		return err
 	}
 
-	if req.OwnerID == "" {
+	if req.OwnerId == "" {
 		e.logger.Error("failed to create account: owner is empty")
 		return nil
 	}
 
-	_, err = e.ds.Account.Create(req.OwnerID, e.secret)
+	_, err = e.ds.Account.Create(req.OwnerId, e.secret)
 	if err != nil {
 		e.logger.Errorf("failed to create account: %s", err)
 		return nil

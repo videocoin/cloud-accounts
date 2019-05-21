@@ -1,4 +1,4 @@
-replicasCount: 3
+replicasCount: 1
 maxUnavailableCount: 0
 
 image:

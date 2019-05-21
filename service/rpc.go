@@ -10,7 +10,7 @@ import (
 	"github.com/VideoCoin/cloud-pkg/grpcutil"
 	"github.com/VideoCoin/go-videocoin/common"
 	"github.com/VideoCoin/go-videocoin/ethclient"
-	protoempty "github.com/golang/protobuf/ptypes/empty"
+	protoempty "github.com/gogo/protobuf/types"
 	"github.com/jinzhu/copier"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
@@ -78,7 +78,7 @@ func (s *RpcServer) Health(ctx context.Context, req *protoempty.Empty) (*rpc.Hea
 }
 
 func (s *RpcServer) Create(ctx context.Context, req *v1.AccountRequest) (*v1.AccountProfile, error) {
-	account, err := s.ds.Account.Create(req.OwnerID, s.secret)
+	account, err := s.ds.Account.Create(req.OwnerId, s.secret)
 	if err != nil {
 		s.logger.Error(err)
 		return nil, rpc.ErrRpcInternal
@@ -112,7 +112,7 @@ func (s *RpcServer) List(ctx context.Context, req *protoempty.Empty) (*v1.ListRe
 }
 
 func (s *RpcServer) Key(ctx context.Context, req *v1.AccountRequest) (*v1.AccountKey, error) {
-	account, err := s.ds.Account.Get(req.OwnerID)
+	account, err := s.ds.Account.GetByOwner(req.OwnerId)
 	if err != nil {
 		s.logger.Error(err)
 		return nil, rpc.ErrRpcInternal
@@ -129,59 +129,7 @@ func (s *RpcServer) Key(ctx context.Context, req *v1.AccountRequest) (*v1.Accoun
 }
 
 func (s *RpcServer) Get(ctx context.Context, req *v1.AccountRequest) (*v1.AccountProfile, error) {
-	err := req.Validate()
-	if err != nil {
-		s.logger.Error(err)
-		return nil, err
-	}
-
-	account, err := s.ds.Account.Get(req.OwnerID)
-	if err != nil {
-		s.logger.Error(err)
-		return nil, rpc.ErrRpcInternal
-	}
-
-	accountProfile := new(v1.AccountProfile)
-	err = copier.Copy(accountProfile, account)
-	if err != nil {
-		s.logger.Error(err)
-		return nil, rpc.ErrRpcInternal
-	}
-
-	return accountProfile, nil
-}
-
-func (s *RpcServer) GetByAddress(ctx context.Context, req *v1.Address) (*v1.AccountProfile, error) {
-	err := req.Validate()
-	if err != nil {
-		s.logger.Error(err)
-		return nil, err
-	}
-
-	account, err := s.ds.Account.GetByAddress(req.Address)
-	if err != nil {
-		s.logger.Error(err)
-		return nil, err
-	}
-
-	accountProfile := new(v1.AccountProfile)
-	err = copier.Copy(accountProfile, account)
-	if err != nil {
-		s.logger.Error(err)
-		return nil, rpc.ErrRpcInternal
-	}
-
-	return accountProfile, nil
-}
-
-func (s *RpcServer) Refresh(ctx context.Context, req *v1.AccountRequest) (*v1.AccountProfile, error) {
-	err := req.Validate()
-	if err != nil {
-		s.logger.Error(err)
-		return nil, err
-	}
-
-	account, err := s.ds.Account.Get(req.OwnerID)
+	account, err := s.ds.Account.Get(req.Id)
 	if err != nil {
 		s.logger.Error(err)
 		return nil, rpc.ErrRpcInternal
@@ -200,10 +148,41 @@ func (s *RpcServer) Refresh(ctx context.Context, req *v1.AccountRequest) (*v1.Ac
 	}
 
 	balance, _ := balanceVdc.Float64()
-	err = s.ds.Account.UpdateBalance(account, balance)
+	if err = s.ds.Account.UpdateBalance(account, balance); err != nil {
+		s.logger.Error(err)
+		return nil, rpc.ErrRpcInternal
+	}
+
+	accountProfile := new(v1.AccountProfile)
+	if err := copier.Copy(accountProfile, account); err != nil {
+		s.logger.Error(err)
+		return nil, rpc.ErrRpcInternal
+	}
+
+	return accountProfile, nil
+}
+
+func (s *RpcServer) GetByOwner(ctx context.Context, req *v1.AccountRequest) (*v1.AccountProfile, error) {
+	account, err := s.ds.Account.GetByOwner(req.OwnerId)
 	if err != nil {
 		s.logger.Error(err)
 		return nil, rpc.ErrRpcInternal
+	}
+
+	accountProfile := new(v1.AccountProfile)
+	if err := copier.Copy(accountProfile, account); err != nil {
+		s.logger.Error(err)
+		return nil, rpc.ErrRpcInternal
+	}
+
+	return accountProfile, nil
+}
+
+func (s *RpcServer) GetByAddress(ctx context.Context, req *v1.Address) (*v1.AccountProfile, error) {
+	account, err := s.ds.Account.GetByAddress(req.Address)
+	if err != nil {
+		s.logger.Error(err)
+		return nil, err
 	}
 
 	accountProfile := new(v1.AccountProfile)

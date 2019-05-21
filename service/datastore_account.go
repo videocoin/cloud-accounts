@@ -3,11 +3,10 @@ package service
 import (
 	"errors"
 	"fmt"
-	"time"
 
-	"github.com/AlekSi/pointer"
 	v1 "github.com/VideoCoin/cloud-api/accounts/v1"
 	"github.com/VideoCoin/cloud-pkg/uuid4"
+	"github.com/golang/protobuf/ptypes"
 	"github.com/jinzhu/gorm"
 )
 
@@ -57,11 +56,10 @@ func (ds *AccountDatastore) Create(userID string, passphrase string) (*v1.Accoun
 	return account, nil
 }
 
-func (ds *AccountDatastore) Get(userID string) (*v1.Account, error) {
+func (ds *AccountDatastore) Get(accountID string) (*v1.Account, error) {
 	account := new(v1.Account)
 
-	err := ds.db.Where("user_id = ?", userID).First(&account).Error
-	if err != nil {
+	if err := ds.db.Where("id = ?", accountID).First(&account).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return nil, ErrAccountNotFound
 		}
@@ -72,11 +70,24 @@ func (ds *AccountDatastore) Get(userID string) (*v1.Account, error) {
 	return account, nil
 }
 
+func (ds *AccountDatastore) GetByOwner(userID string) (*v1.Account, error) {
+	account := new(v1.Account)
+
+	if err := ds.db.Where("user_id = ?", userID).First(&account).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return nil, ErrAccountNotFound
+		}
+
+		return nil, fmt.Errorf("failed to get account by owner id: %s", err.Error())
+	}
+
+	return account, nil
+}
+
 func (ds *AccountDatastore) GetByAddress(address string) (*v1.Account, error) {
 	account := new(v1.Account)
 
-	err := ds.db.Where("address = ?", address).First(&account).Error
-	if err != nil {
+	if err := ds.db.Where("address = ?", address).First(&account).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return nil, ErrAccountNotFound
 		}
@@ -90,8 +101,7 @@ func (ds *AccountDatastore) GetByAddress(address string) (*v1.Account, error) {
 func (ds *AccountDatastore) List() ([]*v1.Account, error) {
 	accounts := []*v1.Account{}
 
-	err := ds.db.Find(&accounts).Error
-	if err != nil {
+	if err := ds.db.Find(&accounts).Error; err != nil {
 		return nil, fmt.Errorf("failed to get accounts list: %s", err)
 	}
 
@@ -99,16 +109,20 @@ func (ds *AccountDatastore) List() ([]*v1.Account, error) {
 }
 
 func (ds *AccountDatastore) UpdateBalance(account *v1.Account, balance float64) error {
+	time, err := ptypes.Timestamp(ptypes.TimestampNow())
+	if err != nil {
+		return err
+	}
+
 	account.Balance = balance
-	account.UpdatedAt = pointer.ToTime(time.Now())
+	account.UpdatedAt = &time
 
 	updates := map[string]interface{}{
 		"balance":   account.Balance,
 		"updatedAt": account.UpdatedAt,
 	}
 
-	err := ds.db.Model(account).Updates(updates).Error
-	if err != nil {
+	if err = ds.db.Model(account).Updates(updates).Error; err != nil {
 		return err
 	}
 
