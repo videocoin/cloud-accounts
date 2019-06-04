@@ -62,3 +62,5 @@ spec:
         - name: secrets
           secret:
             secretName: {{ .Release.Name }}
+      nodeSelector:
+        cloud.google.com/gke-nodepool: api
