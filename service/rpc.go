@@ -12,6 +12,8 @@ import (
 	"github.com/VideoCoin/go-videocoin/ethclient"
 	protoempty "github.com/gogo/protobuf/types"
 	"github.com/jinzhu/copier"
+	"github.com/opentracing/opentracing-go"
+	"github.com/opentracing/opentracing-go/log"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
@@ -78,7 +80,14 @@ func (s *RpcServer) Health(ctx context.Context, req *protoempty.Empty) (*rpc.Hea
 }
 
 func (s *RpcServer) Create(ctx context.Context, req *v1.AccountRequest) (*v1.AccountProfile, error) {
-	account, err := s.ds.Account.Create(req.OwnerId, s.secret)
+	span, ctx := opentracing.StartSpanFromContext(ctx, "Create")
+	defer span.Finish()
+
+	span.LogFields(
+		log.String("owner_id", req.OwnerId),
+	)
+
+	account, err := s.ds.Account.Create(ctx, req.OwnerId, s.secret)
 	if err != nil {
 		s.logger.Error(err)
 		return nil, rpc.ErrRpcInternal
@@ -94,7 +103,10 @@ func (s *RpcServer) Create(ctx context.Context, req *v1.AccountRequest) (*v1.Acc
 }
 
 func (s *RpcServer) List(ctx context.Context, req *protoempty.Empty) (*v1.ListResponse, error) {
-	accounts, err := s.ds.Account.List()
+	span, ctx := opentracing.StartSpanFromContext(ctx, "List")
+	defer span.Finish()
+
+	accounts, err := s.ds.Account.List(ctx)
 	if err != nil {
 		s.logger.Error(err)
 		return nil, err
@@ -112,7 +124,14 @@ func (s *RpcServer) List(ctx context.Context, req *protoempty.Empty) (*v1.ListRe
 }
 
 func (s *RpcServer) Key(ctx context.Context, req *v1.AccountRequest) (*v1.AccountKey, error) {
-	account, err := s.ds.Account.GetByOwner(req.OwnerId)
+	span, ctx := opentracing.StartSpanFromContext(ctx, "Key")
+	defer span.Finish()
+
+	span.LogFields(
+		log.String("owner_id", req.OwnerId),
+	)
+
+	account, err := s.ds.Account.GetByOwner(ctx, req.OwnerId)
 	if err != nil {
 		s.logger.Error(err)
 		return nil, rpc.ErrRpcInternal
@@ -129,7 +148,14 @@ func (s *RpcServer) Key(ctx context.Context, req *v1.AccountRequest) (*v1.Accoun
 }
 
 func (s *RpcServer) Get(ctx context.Context, req *v1.AccountRequest) (*v1.AccountProfile, error) {
-	account, err := s.ds.Account.Get(req.Id)
+	span, ctx := opentracing.StartSpanFromContext(ctx, "Get")
+	defer span.Finish()
+
+	span.LogFields(
+		log.String("id", req.Id),
+	)
+
+	account, err := s.ds.Account.Get(ctx, req.Id)
 	if err != nil {
 		s.logger.Error(err)
 		return nil, rpc.ErrRpcInternal
@@ -148,7 +174,7 @@ func (s *RpcServer) Get(ctx context.Context, req *v1.AccountRequest) (*v1.Accoun
 	}
 
 	balance, _ := balanceVdc.Float64()
-	if err = s.ds.Account.UpdateBalance(account, balance); err != nil {
+	if err = s.ds.Account.UpdateBalance(ctx, account, balance); err != nil {
 		s.logger.Error(err)
 		return nil, rpc.ErrRpcInternal
 	}
@@ -163,7 +189,14 @@ func (s *RpcServer) Get(ctx context.Context, req *v1.AccountRequest) (*v1.Accoun
 }
 
 func (s *RpcServer) GetByOwner(ctx context.Context, req *v1.AccountRequest) (*v1.AccountProfile, error) {
-	account, err := s.ds.Account.GetByOwner(req.OwnerId)
+	span, ctx := opentracing.StartSpanFromContext(ctx, "GetByOwner")
+	defer span.Finish()
+
+	span.LogFields(
+		log.String("id", req.Id),
+	)
+
+	account, err := s.ds.Account.GetByOwner(ctx, req.OwnerId)
 	if err != nil {
 		s.logger.Error(err)
 		return nil, rpc.ErrRpcInternal
@@ -179,7 +212,14 @@ func (s *RpcServer) GetByOwner(ctx context.Context, req *v1.AccountRequest) (*v1
 }
 
 func (s *RpcServer) GetByAddress(ctx context.Context, req *v1.Address) (*v1.AccountProfile, error) {
-	account, err := s.ds.Account.GetByAddress(req.Address)
+	span, ctx := opentracing.StartSpanFromContext(ctx, "GetByAddress")
+	defer span.Finish()
+
+	span.LogFields(
+		log.String("address", req.Address),
+	)
+
+	account, err := s.ds.Account.GetByAddress(ctx, req.Address)
 	if err != nil {
 		s.logger.Error(err)
 		return nil, err

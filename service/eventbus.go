@@ -1,10 +1,15 @@
 package service
 
 import (
+	"context"
 	"encoding/json"
+
+	"github.com/opentracing/opentracing-go"
+	"github.com/opentracing/opentracing-go/ext"
 
 	v1 "github.com/VideoCoin/cloud-api/accounts/v1"
 	"github.com/VideoCoin/cloud-pkg/mqmux"
+	"github.com/opentracing/opentracing-go/log"
 	"github.com/sirupsen/logrus"
 	"github.com/streadway/amqp"
 )
@@ -63,12 +68,28 @@ func (e *EventBus) handleCreateAccount(d amqp.Delivery) error {
 		return err
 	}
 
+	var span opentracing.Span
+	tracer := opentracing.GlobalTracer()
+	spanCtx, err := tracer.Extract(opentracing.TextMap, mqmux.RMQHeaderCarrier(d.Headers))
+
+	if err != nil {
+		span = tracer.StartSpan("handleCreateAccount")
+	} else {
+		span = tracer.StartSpan("handleCreateAccount", ext.RPCServerOption(spanCtx))
+	}
+
+	defer span.Finish()
+
+	span.LogFields(
+		log.String("owner_id", req.OwnerId),
+	)
+
 	if req.OwnerId == "" {
 		e.logger.Error("failed to create account: owner is empty")
 		return nil
 	}
 
-	_, err = e.ds.Account.Create(req.OwnerId, e.secret)
+	_, err = e.ds.Account.Create(opentracing.ContextWithSpan(context.Background(), span), req.OwnerId, e.secret)
 	if err != nil {
 		e.logger.Errorf("failed to create account: %s", err)
 		return nil

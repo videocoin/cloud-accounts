@@ -7,6 +7,7 @@ import (
 
 	"github.com/VideoCoin/cloud-accounts/service"
 	"github.com/VideoCoin/cloud-pkg/logger"
+	"github.com/VideoCoin/cloud-pkg/tracer"
 	"github.com/kelseyhightower/envconfig"
 	"github.com/sirupsen/logrus"
 )
@@ -25,12 +26,19 @@ func main() {
 		"version": Version,
 	})
 
+	closer, err := tracer.NewTracer(ServiceName)
+	if err != nil {
+		log.Info(err.Error())
+	} else {
+		defer closer.Close()
+	}
+
 	cfg := &service.Config{
 		Name:    ServiceName,
 		Version: Version,
 	}
 
-	err := envconfig.Process(ServiceName, cfg)
+	err = envconfig.Process(ServiceName, cfg)
 	if err != nil {
 		log.Fatal(err.Error())
 	}

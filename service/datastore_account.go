@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"errors"
 	"fmt"
 
@@ -8,6 +9,8 @@ import (
 	"github.com/VideoCoin/cloud-pkg/uuid4"
 	"github.com/golang/protobuf/ptypes"
 	"github.com/jinzhu/gorm"
+	"github.com/opentracing/opentracing-go"
+	"github.com/opentracing/opentracing-go/log"
 )
 
 var (
@@ -23,7 +26,14 @@ func NewAccountDatastore(db *gorm.DB) (*AccountDatastore, error) {
 	return &AccountDatastore{db: db}, nil
 }
 
-func (ds *AccountDatastore) Create(userID string, passphrase string) (*v1.Account, error) {
+func (ds *AccountDatastore) Create(ctx context.Context, userID string, passphrase string) (*v1.Account, error) {
+	span, _ := opentracing.StartSpanFromContext(ctx, "Create")
+	defer span.Finish()
+
+	span.LogFields(
+		log.String("owner_id", userID),
+	)
+
 	tx := ds.db.Begin()
 
 	id, err := uuid4.New()
@@ -56,7 +66,14 @@ func (ds *AccountDatastore) Create(userID string, passphrase string) (*v1.Accoun
 	return account, nil
 }
 
-func (ds *AccountDatastore) Get(accountID string) (*v1.Account, error) {
+func (ds *AccountDatastore) Get(ctx context.Context, accountID string) (*v1.Account, error) {
+	span, _ := opentracing.StartSpanFromContext(ctx, "Get")
+	defer span.Finish()
+
+	span.LogFields(
+		log.String("id", accountID),
+	)
+
 	account := new(v1.Account)
 
 	if err := ds.db.Where("id = ?", accountID).First(&account).Error; err != nil {
@@ -70,7 +87,14 @@ func (ds *AccountDatastore) Get(accountID string) (*v1.Account, error) {
 	return account, nil
 }
 
-func (ds *AccountDatastore) GetByOwner(userID string) (*v1.Account, error) {
+func (ds *AccountDatastore) GetByOwner(ctx context.Context, userID string) (*v1.Account, error) {
+	span, _ := opentracing.StartSpanFromContext(ctx, "GetByOwner")
+	defer span.Finish()
+
+	span.LogFields(
+		log.String("owner_id", userID),
+	)
+
 	account := new(v1.Account)
 
 	if err := ds.db.Where("user_id = ?", userID).First(&account).Error; err != nil {
@@ -84,7 +108,14 @@ func (ds *AccountDatastore) GetByOwner(userID string) (*v1.Account, error) {
 	return account, nil
 }
 
-func (ds *AccountDatastore) GetByAddress(address string) (*v1.Account, error) {
+func (ds *AccountDatastore) GetByAddress(ctx context.Context, address string) (*v1.Account, error) {
+	span, _ := opentracing.StartSpanFromContext(ctx, "GetByAddress")
+	defer span.Finish()
+
+	span.LogFields(
+		log.String("address", address),
+	)
+
 	account := new(v1.Account)
 
 	if err := ds.db.Where("address = ?", address).First(&account).Error; err != nil {
@@ -98,7 +129,10 @@ func (ds *AccountDatastore) GetByAddress(address string) (*v1.Account, error) {
 	return account, nil
 }
 
-func (ds *AccountDatastore) List() ([]*v1.Account, error) {
+func (ds *AccountDatastore) List(ctx context.Context) ([]*v1.Account, error) {
+	span, _ := opentracing.StartSpanFromContext(ctx, "List")
+	defer span.Finish()
+
 	accounts := []*v1.Account{}
 
 	if err := ds.db.Find(&accounts).Error; err != nil {
@@ -108,7 +142,15 @@ func (ds *AccountDatastore) List() ([]*v1.Account, error) {
 	return accounts, nil
 }
 
-func (ds *AccountDatastore) UpdateBalance(account *v1.Account, balance float64) error {
+func (ds *AccountDatastore) UpdateBalance(ctx context.Context, account *v1.Account, balance float64) error {
+	span, _ := opentracing.StartSpanFromContext(ctx, "UpdateBalance")
+	defer span.Finish()
+
+	span.LogFields(
+		log.String("account_id", account.Id),
+		log.Float64("balance", balance),
+	)
+
 	time, err := ptypes.Timestamp(ptypes.TimestampNow())
 	if err != nil {
 		return err
