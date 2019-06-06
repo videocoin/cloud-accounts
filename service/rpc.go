@@ -158,6 +158,9 @@ func (s *RpcServer) Get(ctx context.Context, req *v1.AccountRequest) (*v1.Accoun
 	account, err := s.ds.Account.Get(ctx, req.Id)
 	if err != nil {
 		s.logger.Error(err)
+		if err == ErrAccountNotFound {
+			return nil, rpc.ErrRpcNotFound
+		}
 		return nil, rpc.ErrRpcInternal
 	}
 
@@ -193,13 +196,17 @@ func (s *RpcServer) GetByOwner(ctx context.Context, req *v1.AccountRequest) (*v1
 	defer span.Finish()
 
 	span.LogFields(
-		log.String("id", req.Id),
+		log.String("owner_id", req.OwnerId),
 	)
 
 	account, err := s.ds.Account.GetByOwner(ctx, req.OwnerId)
 	if err != nil {
 		s.logger.Error(err)
-		return nil, rpc.ErrRpcInternal
+		if err == ErrAccountNotFound {
+			return nil, rpc.ErrRpcNotFound
+		}
+		return nil, err
+
 	}
 
 	accountProfile := new(v1.AccountProfile)
@@ -229,6 +236,9 @@ func (s *RpcServer) GetByAddress(ctx context.Context, req *v1.Address) (*v1.Acco
 	err = copier.Copy(accountProfile, account)
 	if err != nil {
 		s.logger.Error(err)
+		if err == ErrAccountNotFound {
+			return nil, rpc.ErrRpcNotFound
+		}
 		return nil, rpc.ErrRpcInternal
 	}
 
