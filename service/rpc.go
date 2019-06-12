@@ -13,7 +13,6 @@ import (
 	protoempty "github.com/gogo/protobuf/types"
 	"github.com/jinzhu/copier"
 	"github.com/opentracing/opentracing-go"
-	"github.com/opentracing/opentracing-go/log"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
@@ -83,9 +82,7 @@ func (s *RpcServer) Create(ctx context.Context, req *v1.AccountRequest) (*v1.Acc
 	span, ctx := opentracing.StartSpanFromContext(ctx, "Create")
 	defer span.Finish()
 
-	span.LogFields(
-		log.String("owner_id", req.OwnerId),
-	)
+	span.LogKV("owner_id", req.OwnerId)
 
 	account, err := s.ds.Account.Create(ctx, req.OwnerId, s.secret)
 	if err != nil {
@@ -127,9 +124,7 @@ func (s *RpcServer) Key(ctx context.Context, req *v1.AccountRequest) (*v1.Accoun
 	span, ctx := opentracing.StartSpanFromContext(ctx, "Key")
 	defer span.Finish()
 
-	span.LogFields(
-		log.String("owner_id", req.OwnerId),
-	)
+	span.LogKV("owner_id", req.OwnerId)
 
 	account, err := s.ds.Account.GetByOwner(ctx, req.OwnerId)
 	if err != nil {
@@ -151,9 +146,7 @@ func (s *RpcServer) Get(ctx context.Context, req *v1.AccountRequest) (*v1.Accoun
 	span, ctx := opentracing.StartSpanFromContext(ctx, "Get")
 	defer span.Finish()
 
-	span.LogFields(
-		log.String("id", req.Id),
-	)
+	span.LogKV("id", req.Id)
 
 	account, err := s.ds.Account.Get(ctx, req.Id)
 	if err != nil {
@@ -195,9 +188,7 @@ func (s *RpcServer) GetByOwner(ctx context.Context, req *v1.AccountRequest) (*v1
 	span, ctx := opentracing.StartSpanFromContext(ctx, "GetByOwner")
 	defer span.Finish()
 
-	span.LogFields(
-		log.String("owner_id", req.OwnerId),
-	)
+	span.LogKV("owner_id", req.OwnerId)
 
 	account, err := s.ds.Account.GetByOwner(ctx, req.OwnerId)
 	if err != nil {
@@ -222,9 +213,7 @@ func (s *RpcServer) GetByAddress(ctx context.Context, req *v1.Address) (*v1.Acco
 	span, ctx := opentracing.StartSpanFromContext(ctx, "GetByAddress")
 	defer span.Finish()
 
-	span.LogFields(
-		log.String("address", req.Address),
-	)
+	span.LogKV("address", req.Address)
 
 	account, err := s.ds.Account.GetByAddress(ctx, req.Address)
 	if err != nil {

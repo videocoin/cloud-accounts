@@ -10,7 +10,6 @@ import (
 	"github.com/golang/protobuf/ptypes"
 	"github.com/jinzhu/gorm"
 	"github.com/opentracing/opentracing-go"
-	"github.com/opentracing/opentracing-go/log"
 )
 
 var (
@@ -30,9 +29,7 @@ func (ds *AccountDatastore) Create(ctx context.Context, userID string, passphras
 	span, _ := opentracing.StartSpanFromContext(ctx, "Create")
 	defer span.Finish()
 
-	span.LogFields(
-		log.String("owner_id", userID),
-	)
+	span.LogKV("owner_id", userID)
 
 	tx := ds.db.Begin()
 
@@ -70,9 +67,7 @@ func (ds *AccountDatastore) Get(ctx context.Context, accountID string) (*v1.Acco
 	span, _ := opentracing.StartSpanFromContext(ctx, "Get")
 	defer span.Finish()
 
-	span.LogFields(
-		log.String("id", accountID),
-	)
+	span.LogKV("id", accountID)
 
 	account := new(v1.Account)
 
@@ -91,9 +86,7 @@ func (ds *AccountDatastore) GetByOwner(ctx context.Context, userID string) (*v1.
 	span, _ := opentracing.StartSpanFromContext(ctx, "GetByOwner")
 	defer span.Finish()
 
-	span.LogFields(
-		log.String("owner_id", userID),
-	)
+	span.LogKV("owner_id", userID)
 
 	account := new(v1.Account)
 
@@ -112,9 +105,7 @@ func (ds *AccountDatastore) GetByAddress(ctx context.Context, address string) (*
 	span, _ := opentracing.StartSpanFromContext(ctx, "GetByAddress")
 	defer span.Finish()
 
-	span.LogFields(
-		log.String("address", address),
-	)
+	span.LogKV("address", address)
 
 	account := new(v1.Account)
 
@@ -146,10 +137,7 @@ func (ds *AccountDatastore) UpdateBalance(ctx context.Context, account *v1.Accou
 	span, _ := opentracing.StartSpanFromContext(ctx, "UpdateBalance")
 	defer span.Finish()
 
-	span.LogFields(
-		log.String("account_id", account.Id),
-		log.Float64("balance", balance),
-	)
+	span.LogKV("account_id", account.Id, "balance", balance)
 
 	time, err := ptypes.Timestamp(ptypes.TimestampNow())
 	if err != nil {

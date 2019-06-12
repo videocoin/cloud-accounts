@@ -9,7 +9,6 @@ import (
 
 	v1 "github.com/VideoCoin/cloud-api/accounts/v1"
 	"github.com/VideoCoin/cloud-pkg/mqmux"
-	"github.com/opentracing/opentracing-go/log"
 	"github.com/sirupsen/logrus"
 	"github.com/streadway/amqp"
 )
@@ -80,9 +79,7 @@ func (e *EventBus) handleCreateAccount(d amqp.Delivery) error {
 
 	defer span.Finish()
 
-	span.LogFields(
-		log.String("owner_id", req.OwnerId),
-	)
+	span.LogKV("owner_id", req.OwnerId)
 
 	if req.OwnerId == "" {
 		e.logger.Error("failed to create account: owner is empty")
