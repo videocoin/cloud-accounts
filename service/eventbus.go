@@ -7,8 +7,8 @@ import (
 	"github.com/opentracing/opentracing-go"
 	"github.com/opentracing/opentracing-go/ext"
 
-	v1 "github.com/VideoCoin/cloud-api/accounts/v1"
-	"github.com/VideoCoin/cloud-pkg/mqmux"
+	v1 "github.com/videocoin/cloud-api/accounts/v1"
+	"github.com/videocoin/cloud-pkg/mqmux"
 	"github.com/sirupsen/logrus"
 	"github.com/streadway/amqp"
 )

@@ -5,8 +5,8 @@ import (
 	"errors"
 	"fmt"
 
-	v1 "github.com/VideoCoin/cloud-api/accounts/v1"
-	"github.com/VideoCoin/cloud-pkg/uuid4"
+	v1 "github.com/videocoin/cloud-api/accounts/v1"
+	"github.com/videocoin/cloud-pkg/uuid4"
 	"github.com/golang/protobuf/ptypes"
 	"github.com/jinzhu/gorm"
 	"github.com/opentracing/opentracing-go"

@@ -4,7 +4,7 @@ import (
 	"crypto/rand"
 	"math/big"
 
-	"github.com/VideoCoin/go-videocoin/accounts/keystore"
+	"github.com/ethereum/go-ethereum/accounts/keystore"
 )
 
 type Key struct {

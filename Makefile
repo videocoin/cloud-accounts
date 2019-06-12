@@ -28,8 +28,8 @@ build-dev:
 deps:
 	env GO111MODULE=on go mod vendor
 	# https://github.com/ethereum/go-ethereum/issues/2738
-	cp -r $(GOPATH)/src/github.com/VideoCoin/go-videocoin/crypto/secp256k1/libsecp256k1 \
-	vendor/github.com/VideoCoin/go-videocoin/crypto/secp256k1/
+	cp -r $(GOPATH)/src/github.com/ethereum/go-ethereum/crypto/secp256k1/libsecp256k1 \
+	vendor/github.com/ethereum/go-ethereum/crypto/secp256k1/
 
 docker-build:
 	docker build -t gcr.io/${GCP_PROJECT}/${NAME}:${VERSION} -f Dockerfile .

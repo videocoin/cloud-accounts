@@ -5,11 +5,11 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/VideoCoin/cloud-accounts/service"
-	"github.com/VideoCoin/cloud-pkg/logger"
-	"github.com/VideoCoin/cloud-pkg/tracer"
 	"github.com/kelseyhightower/envconfig"
 	"github.com/sirupsen/logrus"
+	"github.com/videocoin/cloud-accounts/service"
+	"github.com/videocoin/cloud-pkg/logger"
+	"github.com/videocoin/cloud-pkg/tracer"
 )
 
 var (

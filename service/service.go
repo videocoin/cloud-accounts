@@ -1,7 +1,7 @@
 package service
 
 import (
-	"github.com/VideoCoin/cloud-pkg/mqmux"
+	"github.com/videocoin/cloud-pkg/mqmux"
 )
 
 type Service struct {
