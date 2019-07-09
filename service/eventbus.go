@@ -7,10 +7,10 @@ import (
 	"github.com/opentracing/opentracing-go"
 	"github.com/opentracing/opentracing-go/ext"
 
-	v1 "github.com/videocoin/cloud-api/accounts/v1"
-	"github.com/videocoin/cloud-pkg/mqmux"
 	"github.com/sirupsen/logrus"
 	"github.com/streadway/amqp"
+	v1 "github.com/videocoin/cloud-api/accounts/v1"
+	"github.com/videocoin/cloud-pkg/mqmux"
 )
 
 type EventBus struct {
@@ -79,7 +79,7 @@ func (e *EventBus) handleCreateAccount(d amqp.Delivery) error {
 
 	defer span.Finish()
 
-	span.LogKV("owner_id", req.OwnerId)
+	span.SetTag("owner_id", req.OwnerId)
 
 	if req.OwnerId == "" {
 		e.logger.Error("failed to create account: owner is empty")
