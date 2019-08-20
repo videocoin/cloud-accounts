@@ -158,10 +158,10 @@ github.com/uber/jaeger-client-go/thrift-gen/agent
 github.com/uber/jaeger-client-go/thrift-gen/baggage
 # github.com/uber/jaeger-lib v2.0.0+incompatible
 github.com/uber/jaeger-lib/metrics
-# github.com/videocoin/cloud-api v0.1.18
+# github.com/videocoin/cloud-api v0.1.178
 github.com/videocoin/cloud-api/accounts/v1
 github.com/videocoin/cloud-api/rpc
-# github.com/videocoin/cloud-pkg v0.0.0-20190612184810-e59f864191f6
+# github.com/videocoin/cloud-pkg v0.0.5
 github.com/videocoin/cloud-pkg/logger
 github.com/videocoin/cloud-pkg/tracer
 github.com/videocoin/cloud-pkg/grpcutil
@@ -172,9 +172,9 @@ golang.org/x/crypto/pbkdf2
 golang.org/x/crypto/scrypt
 golang.org/x/crypto/sha3
 # golang.org/x/net v0.0.0-20190522155817-f3200d17e092
-golang.org/x/net/context
 golang.org/x/net/trace
 golang.org/x/net/websocket
+golang.org/x/net/context
 golang.org/x/net/internal/timeseries
 golang.org/x/net/http2
 golang.org/x/net/http2/hpack

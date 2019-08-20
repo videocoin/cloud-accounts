@@ -16,7 +16,8 @@ func NewTracer(serviceName string) (io.Closer, error) {
 
 	cfg.Sampler.Type = jaeger.SamplerTypeConst
 	cfg.Sampler.Param = 1
-	cfg.Reporter.LogSpans = true
+	// set JAEGER_REPORTER_LOG_SPANS to enable
+	cfg.Reporter.LogSpans = false
 
 	return cfg.InitGlobalTracer(
 		serviceName,

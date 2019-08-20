@@ -13,6 +13,7 @@ import (
 	golang_proto "github.com/golang/protobuf/proto"
 	io "io"
 	math "math"
+	math_bits "math/bits"
 	time "time"
 )
 
@@ -344,9 +345,9 @@ func (m *Account) MarshalTo(dAtA []byte) (int, error) {
 		dAtA[i] = 0x4a
 		i++
 		i = encodeVarintAccount(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(*m.UpdatedAt)))
-		n1, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(*m.UpdatedAt, dAtA[i:])
-		if err != nil {
-			return 0, err
+		n1, err1 := github_com_gogo_protobuf_types.StdTimeMarshalTo(*m.UpdatedAt, dAtA[i:])
+		if err1 != nil {
+			return 0, err1
 		}
 		i += n1
 	}
@@ -393,9 +394,9 @@ func (m *AccountProfile) MarshalTo(dAtA []byte) (int, error) {
 		dAtA[i] = 0x22
 		i++
 		i = encodeVarintAccount(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(*m.UpdatedAt)))
-		n2, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(*m.UpdatedAt, dAtA[i:])
-		if err != nil {
-			return 0, err
+		n2, err2 := github_com_gogo_protobuf_types.StdTimeMarshalTo(*m.UpdatedAt, dAtA[i:])
+		if err2 != nil {
+			return 0, err2
 		}
 		i += n2
 	}
@@ -530,14 +531,7 @@ func (m *AccountKey) Size() (n int) {
 }
 
 func sovAccount(x uint64) (n int) {
-	for {
-		n++
-		x >>= 7
-		if x == 0 {
-			break
-		}
-	}
-	return n
+	return (math_bits.Len64(x|1) + 6) / 7
 }
 func sozAccount(x uint64) (n int) {
 	return sovAccount(uint64((x << 1) ^ uint64((int64(x) >> 63))))
@@ -557,7 +551,7 @@ func (m *Account) Unmarshal(dAtA []byte) error {
 			}
 			b := dAtA[iNdEx]
 			iNdEx++
-			wire |= (uint64(b) & 0x7F) << shift
+			wire |= uint64(b&0x7F) << shift
 			if b < 0x80 {
 				break
 			}
@@ -585,7 +579,7 @@ func (m *Account) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
+				stringLen |= uint64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -595,6 +589,9 @@ func (m *Account) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthAccount
 			}
 			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthAccount
+			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -614,7 +611,7 @@ func (m *Account) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
+				stringLen |= uint64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -624,6 +621,9 @@ func (m *Account) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthAccount
 			}
 			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthAccount
+			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -643,7 +643,7 @@ func (m *Account) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
+				stringLen |= uint64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -653,6 +653,9 @@ func (m *Account) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthAccount
 			}
 			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthAccount
+			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -672,7 +675,7 @@ func (m *Account) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
+				stringLen |= uint64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -682,6 +685,9 @@ func (m *Account) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthAccount
 			}
 			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthAccount
+			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -712,7 +718,7 @@ func (m *Account) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
+				msglen |= int(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -721,6 +727,9 @@ func (m *Account) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthAccount
 			}
 			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthAccount
+			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -738,6 +747,9 @@ func (m *Account) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			if skippy < 0 {
+				return ErrInvalidLengthAccount
+			}
+			if (iNdEx + skippy) < 0 {
 				return ErrInvalidLengthAccount
 			}
 			if (iNdEx + skippy) > l {
@@ -768,7 +780,7 @@ func (m *AccountProfile) Unmarshal(dAtA []byte) error {
 			}
 			b := dAtA[iNdEx]
 			iNdEx++
-			wire |= (uint64(b) & 0x7F) << shift
+			wire |= uint64(b&0x7F) << shift
 			if b < 0x80 {
 				break
 			}
@@ -796,7 +808,7 @@ func (m *AccountProfile) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
+				stringLen |= uint64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -806,6 +818,9 @@ func (m *AccountProfile) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthAccount
 			}
 			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthAccount
+			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -825,7 +840,7 @@ func (m *AccountProfile) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
+				stringLen |= uint64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -835,6 +850,9 @@ func (m *AccountProfile) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthAccount
 			}
 			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthAccount
+			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -865,7 +883,7 @@ func (m *AccountProfile) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
+				msglen |= int(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -874,6 +892,9 @@ func (m *AccountProfile) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthAccount
 			}
 			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthAccount
+			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -891,6 +912,9 @@ func (m *AccountProfile) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			if skippy < 0 {
+				return ErrInvalidLengthAccount
+			}
+			if (iNdEx + skippy) < 0 {
 				return ErrInvalidLengthAccount
 			}
 			if (iNdEx + skippy) > l {
@@ -921,7 +945,7 @@ func (m *AccountKey) Unmarshal(dAtA []byte) error {
 			}
 			b := dAtA[iNdEx]
 			iNdEx++
-			wire |= (uint64(b) & 0x7F) << shift
+			wire |= uint64(b&0x7F) << shift
 			if b < 0x80 {
 				break
 			}
@@ -949,7 +973,7 @@ func (m *AccountKey) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
+				stringLen |= uint64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -959,6 +983,9 @@ func (m *AccountKey) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthAccount
 			}
 			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthAccount
+			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -978,7 +1005,7 @@ func (m *AccountKey) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
+				stringLen |= uint64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -988,6 +1015,9 @@ func (m *AccountKey) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthAccount
 			}
 			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthAccount
+			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -1000,6 +1030,9 @@ func (m *AccountKey) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			if skippy < 0 {
+				return ErrInvalidLengthAccount
+			}
+			if (iNdEx + skippy) < 0 {
 				return ErrInvalidLengthAccount
 			}
 			if (iNdEx + skippy) > l {
@@ -1069,8 +1102,11 @@ func skipAccount(dAtA []byte) (n int, err error) {
 					break
 				}
 			}
-			iNdEx += length
 			if length < 0 {
+				return 0, ErrInvalidLengthAccount
+			}
+			iNdEx += length
+			if iNdEx < 0 {
 				return 0, ErrInvalidLengthAccount
 			}
 			return iNdEx, nil
@@ -1101,6 +1137,9 @@ func skipAccount(dAtA []byte) (n int, err error) {
 					return 0, err
 				}
 				iNdEx = start + next
+				if iNdEx < 0 {
+					return 0, ErrInvalidLengthAccount
+				}
 			}
 			return iNdEx, nil
 		case 4:
