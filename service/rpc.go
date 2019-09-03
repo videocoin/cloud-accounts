@@ -19,23 +19,23 @@ import (
 )
 
 type RpcServerOptions struct {
-	Addr         string
-	NodeHTTPAddr string
-	Secret       string
-	Logger       *logrus.Entry
-	DS           *Datastore
-	EB           *EventBus
+	Addr            string
+	RPCNodeHTTPAddr string
+	ClientSecret    string
+	Logger          *logrus.Entry
+	DS              *Datastore
+	EB              *EventBus
 }
 
 type RpcServer struct {
-	addr   string
-	secret string
-	grpc   *grpc.Server
-	listen net.Listener
-	logger *logrus.Entry
-	ds     *Datastore
-	eb     *EventBus
-	ec     *ethclient.Client
+	addr         string
+	clientSecret string
+	grpc         *grpc.Server
+	listen       net.Listener
+	logger       *logrus.Entry
+	ds           *Datastore
+	eb           *EventBus
+	ec           *ethclient.Client
 }
 
 func NewRpcServer(opts *RpcServerOptions) (*RpcServer, error) {
@@ -47,20 +47,20 @@ func NewRpcServer(opts *RpcServerOptions) (*RpcServer, error) {
 		return nil, err
 	}
 
-	ethClient, err := ethclient.Dial(opts.NodeHTTPAddr)
+	ethClient, err := ethclient.Dial(opts.RPCNodeHTTPAddr)
 	if err != nil {
 		return nil, fmt.Errorf("failed to dial eth client: %s", err.Error())
 	}
 
 	rpcServer := &RpcServer{
-		addr:   opts.Addr,
-		secret: opts.Secret,
-		grpc:   grpcServer,
-		listen: listen,
-		logger: opts.Logger,
-		ds:     opts.DS,
-		eb:     opts.EB,
-		ec:     ethClient,
+		addr:         opts.Addr,
+		clientSecret: opts.ClientSecret,
+		grpc:         grpcServer,
+		listen:       listen,
+		logger:       opts.Logger,
+		ds:           opts.DS,
+		eb:           opts.EB,
+		ec:           ethClient,
 	}
 
 	v1.RegisterAccountServiceServer(grpcServer, rpcServer)
@@ -84,7 +84,7 @@ func (s *RpcServer) Create(ctx context.Context, req *v1.AccountRequest) (*v1.Acc
 
 	span.SetTag("owner_id", req.OwnerId)
 
-	account, err := s.ds.Account.Create(ctx, req.OwnerId, s.secret)
+	account, err := s.ds.Account.Create(ctx, req.OwnerId, s.clientSecret)
 	if err != nil {
 		s.logger.Error(err)
 		return nil, rpc.ErrRpcInternal

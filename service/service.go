@@ -23,18 +23,18 @@ func NewService(cfg *Config) (*Service, error) {
 	mq.Logger = cfg.Logger.WithField("system", "mq")
 
 	eblogger := cfg.Logger.WithField("system", "eventbus")
-	eb, err := NewEventBus(mq, ds, cfg.Secret, eblogger)
+	eb, err := NewEventBus(mq, ds, cfg.ClientSecret, eblogger)
 	if err != nil {
 		return nil, err
 	}
 
 	rpcConfig := &RpcServerOptions{
-		Addr:         cfg.RPCAddr,
-		NodeHTTPAddr: cfg.NodeHTTPAddr,
-		Secret:       cfg.Secret,
-		Logger:       cfg.Logger,
-		DS:           ds,
-		EB:           eb,
+		Addr:            cfg.RPCAddr,
+		RPCNodeHTTPAddr: cfg.RPCNodeHTTPAddr,
+		ClientSecret:    cfg.ClientSecret,
+		Logger:          cfg.Logger,
+		DS:              ds,
+		EB:              eb,
 	}
 
 	rpc, err := NewRpcServer(rpcConfig)

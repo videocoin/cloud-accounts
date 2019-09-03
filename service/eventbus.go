@@ -14,18 +14,18 @@ import (
 )
 
 type EventBus struct {
-	logger *logrus.Entry
-	mq     *mqmux.WorkerMux
-	ds     *Datastore
-	secret string
+	logger       *logrus.Entry
+	mq           *mqmux.WorkerMux
+	ds           *Datastore
+	clientSecret string
 }
 
-func NewEventBus(mq *mqmux.WorkerMux, ds *Datastore, secret string, logger *logrus.Entry) (*EventBus, error) {
+func NewEventBus(mq *mqmux.WorkerMux, ds *Datastore, clientSecret string, logger *logrus.Entry) (*EventBus, error) {
 	return &EventBus{
-		logger: logger,
-		mq:     mq,
-		ds:     ds,
-		secret: secret,
+		logger:       logger,
+		mq:           mq,
+		ds:           ds,
+		clientSecret: clientSecret,
 	}, nil
 }
 
@@ -86,7 +86,7 @@ func (e *EventBus) handleCreateAccount(d amqp.Delivery) error {
 		return nil
 	}
 
-	_, err = e.ds.Account.Create(opentracing.ContextWithSpan(context.Background(), span), req.OwnerId, e.secret)
+	_, err = e.ds.Account.Create(opentracing.ContextWithSpan(context.Background(), span), req.OwnerId, e.clientSecret)
 	if err != nil {
 		e.logger.Errorf("failed to create account: %s", err)
 		return nil
