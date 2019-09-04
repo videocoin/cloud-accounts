@@ -200,6 +200,24 @@ func (s *RpcServer) GetByOwner(ctx context.Context, req *v1.AccountRequest) (*v1
 
 	}
 
+	address := common.HexToAddress(account.Address)
+	balanceWei, err := s.ec.BalanceAt(context.Background(), address, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	balanceVdc, err := wei2Vdc(balanceWei)
+	if err != nil {
+		s.logger.Error(err)
+		return nil, rpc.ErrRpcInternal
+	}
+
+	balance, _ := balanceVdc.Float64()
+	if err = s.ds.Account.UpdateBalance(ctx, account, balance); err != nil {
+		s.logger.Error(err)
+		return nil, rpc.ErrRpcInternal
+	}
+
 	accountProfile := new(v1.AccountProfile)
 	if err := copier.Copy(accountProfile, account); err != nil {
 		s.logger.Error(err)
