@@ -80,10 +80,10 @@ github.com/grpc-ecosystem/go-grpc-middleware/util/backoffutils
 github.com/grpc-ecosystem/go-grpc-middleware/util/metautils
 # github.com/grpc-ecosystem/go-grpc-prometheus v1.2.0
 github.com/grpc-ecosystem/go-grpc-prometheus
-# github.com/grpc-ecosystem/grpc-gateway v1.9.0
+# github.com/grpc-ecosystem/grpc-gateway v1.9.3
 github.com/grpc-ecosystem/grpc-gateway/runtime
-github.com/grpc-ecosystem/grpc-gateway/utilities
 github.com/grpc-ecosystem/grpc-gateway/internal
+github.com/grpc-ecosystem/grpc-gateway/utilities
 # github.com/jinzhu/copier v0.0.0-20180308034124-7e38e58719c3
 github.com/jinzhu/copier
 # github.com/jinzhu/gorm v1.9.9
@@ -158,10 +158,10 @@ github.com/uber/jaeger-client-go/thrift-gen/agent
 github.com/uber/jaeger-client-go/thrift-gen/baggage
 # github.com/uber/jaeger-lib v2.0.0+incompatible
 github.com/uber/jaeger-lib/metrics
-# github.com/videocoin/cloud-api v0.1.178
+# github.com/videocoin/cloud-api v0.2.14
 github.com/videocoin/cloud-api/accounts/v1
 github.com/videocoin/cloud-api/rpc
-# github.com/videocoin/cloud-pkg v0.0.5
+# github.com/videocoin/cloud-pkg v0.0.6
 github.com/videocoin/cloud-pkg/logger
 github.com/videocoin/cloud-pkg/tracer
 github.com/videocoin/cloud-pkg/grpcutil
@@ -191,15 +191,15 @@ golang.org/x/text/transform
 # google.golang.org/appengine v1.4.0
 google.golang.org/appengine/cloudsql
 # google.golang.org/genproto v0.0.0-20190404172233-64821d5d2107
+google.golang.org/genproto/googleapis/rpc/status
 google.golang.org/genproto/googleapis/api/httpbody
 google.golang.org/genproto/protobuf/field_mask
-google.golang.org/genproto/googleapis/rpc/status
 # google.golang.org/grpc v1.21.1
 google.golang.org/grpc
 google.golang.org/grpc/codes
 google.golang.org/grpc/reflection
-google.golang.org/grpc/grpclog
 google.golang.org/grpc/status
+google.golang.org/grpc/grpclog
 google.golang.org/grpc/keepalive
 google.golang.org/grpc/balancer
 google.golang.org/grpc/balancer/roundrobin
