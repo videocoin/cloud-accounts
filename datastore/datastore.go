@@ -1,4 +1,4 @@
-package service
+package datastore
 
 import (
 	"github.com/jinzhu/gorm"
@@ -6,7 +6,9 @@ import (
 )
 
 type Datastore struct {
-	Account *AccountDatastore
+	Account  *AccountDatastore
+	Transfer *TransferDatastore
+	User     *UserDatastore
 }
 
 func NewDatastore(uri string) (*Datastore, error) {
@@ -25,6 +27,20 @@ func NewDatastore(uri string) (*Datastore, error) {
 	}
 
 	ds.Account = accountsDs
+
+	transfersDs, err := NewTransferDatastore(db)
+	if err != nil {
+		return nil, err
+	}
+
+	ds.Transfer = transfersDs
+
+	userDs, err := NewUserDatastore(db)
+	if err != nil {
+		return nil, err
+	}
+
+	ds.User = userDs
 
 	return ds, nil
 }
