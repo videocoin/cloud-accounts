@@ -1,4 +1,4 @@
-package service
+package ebus
 
 import (
 	"context"
@@ -9,18 +9,20 @@ import (
 
 	"github.com/sirupsen/logrus"
 	"github.com/streadway/amqp"
+	"github.com/videocoin/cloud-accounts/datastore"
 	v1 "github.com/videocoin/cloud-api/accounts/v1"
+	notificationv1 "github.com/videocoin/cloud-api/notifications/v1"
 	"github.com/videocoin/cloud-pkg/mqmux"
 )
 
 type EventBus struct {
 	logger       *logrus.Entry
 	mq           *mqmux.WorkerMux
-	ds           *Datastore
+	ds           *datastore.Datastore
 	clientSecret string
 }
 
-func NewEventBus(mq *mqmux.WorkerMux, ds *Datastore, clientSecret string, logger *logrus.Entry) (*EventBus, error) {
+func NewEventBus(mq *mqmux.WorkerMux, ds *datastore.Datastore, clientSecret string, logger *logrus.Entry) (*EventBus, error) {
 	return &EventBus{
 		logger:       logger,
 		mq:           mq,
@@ -48,6 +50,10 @@ func (e *EventBus) Stop() error {
 }
 
 func (e *EventBus) registerPublishers() error {
+	if err := e.mq.Publisher("notifications/send"); err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -93,4 +99,18 @@ func (e *EventBus) handleCreateAccount(d amqp.Delivery) error {
 	}
 
 	return nil
+}
+
+func (e *EventBus) SendNotification(span opentracing.Span, req *notificationv1.Notification) error {
+	headers := make(amqp.Table)
+	ext.SpanKindRPCServer.Set(span)
+	ext.Component.Set(span, "accounts")
+
+	span.Tracer().Inject(
+		span.Context(),
+		opentracing.TextMap,
+		mqmux.RMQHeaderCarrier(headers),
+	)
+
+	return e.mq.PublishX("notifications/send", req, headers)
 }
