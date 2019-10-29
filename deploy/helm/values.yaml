@@ -21,16 +21,19 @@ autoscaler:
 
 resources:
   limits:
-   cpu: 200m
+   cpu: 400m
    memory: 1000Mi
   requests:
-   cpu: 200m
+   cpu: 400m
    memory: 1000Mi
 
 secrets:
   nodeHttpAddr: ""
+  nodeEthAddr: ""
   dbUri: ""
   mqUri: ""
-  secret: ""
+  bankKey: ""
+  bankSecret: ""
+  clientSecret: ""
   sentryDsn: ""
 
