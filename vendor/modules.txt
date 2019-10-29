@@ -43,7 +43,7 @@ github.com/getsentry/raven-go
 github.com/go-sql-driver/mysql
 # github.com/go-stack/stack v1.8.0
 github.com/go-stack/stack
-# github.com/gogo/googleapis v1.2.0
+# github.com/gogo/googleapis v1.3.0
 github.com/gogo/googleapis/google/api
 # github.com/gogo/protobuf v1.3.1
 github.com/gogo/protobuf/gogoproto
