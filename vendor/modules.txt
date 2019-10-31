@@ -161,10 +161,10 @@ github.com/uber/jaeger-client-go/utils
 github.com/uber/jaeger-lib/metrics
 # github.com/videocoin/cloud-api v0.2.15 => ../cloud-api
 github.com/videocoin/cloud-api/accounts/v1
-github.com/videocoin/cloud-api/notifications/v1
-github.com/videocoin/cloud-api/rpc
 github.com/videocoin/cloud-api/transfers/v1
 github.com/videocoin/cloud-api/users/v1
+github.com/videocoin/cloud-api/notifications/v1
+github.com/videocoin/cloud-api/rpc
 # github.com/videocoin/cloud-pkg v0.0.6 => ../cloud-pkg
 github.com/videocoin/cloud-pkg/bcops
 github.com/videocoin/cloud-pkg/ethutils
@@ -203,6 +203,8 @@ google.golang.org/genproto/googleapis/rpc/status
 google.golang.org/genproto/protobuf/field_mask
 # google.golang.org/grpc v1.21.1
 google.golang.org/grpc
+google.golang.org/grpc/health
+google.golang.org/grpc/health/grpc_health_v1
 google.golang.org/grpc/balancer
 google.golang.org/grpc/balancer/base
 google.golang.org/grpc/balancer/roundrobin
