@@ -9,10 +9,15 @@ docker_login: &docker_login
   command: |
     docker login -u _json_key -p "$GCLOUD_SERVICE_KEY" https://gcr.io
 
-gcloud_auth: &gcloud_auth
-  name: gcloud auth
+run_consul: &run_consul
+  name: run consul proxy
   command: |
-    echo $GCLOUD_SERVICE_KEY | gcloud auth activate-service-account --key-file=-
+    kubectl port-forward config-consul-0 8500
+  background: true
+
+init_gcloud: &init_gcloud
+  name: Init gcloud
+  command: .circleci/init-gcloud.sh
 
 base_docker_image: &base_docker_image
   - image: gcr.io/videocoin-network/cloud-base-ci:1.0
@@ -53,30 +58,17 @@ jobs:
   deploy:
     <<: *defaults
     steps:
-      - *restore_repo
+      - checkout
       - setup_remote_docker:
           <<: *setup_remote_docker
       - run:
-          <<: *gcloud_auth
+          <<: *init_gcloud
       - run:
-          name: init environment
-          command: |
-            if [ $CIRCLE_BRANCH = 'develop' ]; then
-              gcloud container clusters get-credentials thor --zone us-central1-a --project videocoin-network
-              echo 'export ENV="thor"' >> $BASH_ENV
-              echo 'export CONSUL_AUTH=$CONSUL_AUTH_THOR' >> $BASH_ENV
-            fi
-
-            if [ $CIRCLE_BRANCH = 'staging' ]; then
-              gcloud container clusters get-credentials groot --zone us-central1-a --project videocoin-network
-              echo 'export ENV="groot"' >> $BASH_ENV
-              echo 'export CONSUL_AUTH=$CONSUL_AUTH_GROOT' >> $BASH_ENV
-            fi
-
-            helm init --client-only
+          <<: *run_consul
       - run:
           name: deploy binary
           command: |
+            timeout -t 15 bash .circleci/wait-consul.sh
             make deploy
 workflows:
   version: 2
@@ -89,5 +81,6 @@ workflows:
           filters:
             branches:
               only:
+                - sandbox
                 - develop
                 - staging
