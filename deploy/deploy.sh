@@ -62,22 +62,6 @@ function get_vars() {
     readonly SENTRY_DSN=`consul kv get -http-addr=${CONSUL_ADDR} config/${ENV}/services/${CHART_NAME}/secrets/sentryDsn`
 }
 
-function get_vars_ci() {
-    log_info "Getting ci variables..."
-    readonly KUBE_CONTEXT=`curl --silent --user ${CONSUL_AUTH} http://consul.${ENV}.videocoin.network/v1/kv/config/${ENV}/common/kube_context?raw`
-
-    readonly TOKEN_ADDR=`curl --silent --user ${CONSUL_AUTH} http://consul.${ENV}.videocoin.network/v1/kv/config/${ENV}/services/${CHART_NAME}/vars/tokenAddr?raw `
-    
-    readonly RPC_ETH_HTTP_ADDR=`curl --silent --user ${CONSUL_AUTH} http://consul.${ENV}.videocoin.network/v1/kv/config/${ENV}/services/${CHART_NAME}/secrets/rpcEthHttpAddr?raw `
-    readonly RPC_NODE_HTTP_ADDR=`curl --silent --user ${CONSUL_AUTH} http://consul.${ENV}.videocoin.network/v1/kv/config/${ENV}/services/${CHART_NAME}/secrets/rpcNodeHttpAddr?raw `
-    readonly DB_URI=`curl --silent --user ${CONSUL_AUTH} http://consul.${ENV}.videocoin.network/v1/kv/config/${ENV}/services/${CHART_NAME}/secrets/dbUri?raw`
-    readonly MQ_URI=`curl --silent --user ${CONSUL_AUTH} http://consul.${ENV}.videocoin.network/v1/kv/config/${ENV}/services/${CHART_NAME}/secrets/mqUri?raw`    
-    readonly BANK_KEY=`curl --silent --user ${CONSUL_AUTH} http://consul.${ENV}.videocoin.network/v1/kv/config/${ENV}/services/${CHART_NAME}/secrets/bankKey?raw`
-    readonly BANK_SECRET=`curl --silent --user ${CONSUL_AUTH} http://consul.${ENV}.videocoin.network/v1/kv/config/${ENV}/services/${CHART_NAME}/secrets/bankSecret?raw`
-    readonly CLIENT_SECRET=`curl --silent --user ${CONSUL_AUTH} http://consul.${ENV}.videocoin.network/v1/kv/config/${ENV}/services/${CHART_NAME}/secrets/clientSecret?raw`
-    readonly SENTRY_DSN=`curl --silent --user ${CONSUL_AUTH} http://consul.${ENV}.videocoin.network/v1/kv/config/${ENV}/services/${CHART_NAME}/secrets/sentryDsn?raw`
-}
-
 function deploy() {
     log_info "Deploying ${CHART_NAME} version ${VERSION}"
     helm upgrade \
@@ -111,12 +95,7 @@ if ! $(has_helm); then
     exit 1
 fi
 
-if [ "${CI_ENABLED}" = "1" ]; then
-  get_vars_ci
-else
-  get_vars
-fi
-
+get_vars
 update_deps
 deploy
 
