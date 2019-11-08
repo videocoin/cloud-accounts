@@ -5,30 +5,7 @@ import (
 	"math/big"
 	"strconv"
 	"strings"
-
-	"github.com/ethereum/go-ethereum/crypto"
 )
-
-// AddressHex creates addressHex
-func AddressHex(i int) string {
-	addressHex, _ := PrivateKeyHexToAddressHex(PrivateKeyHex(i))
-	return addressHex
-}
-
-// PrivateKeyHex creates privateKeyHex
-func PrivateKeyHex(i int) string {
-	return fmt.Sprintf("%064d", i)
-}
-
-// PrivateKeyHexToAddressHex converts from privatekey to address
-func PrivateKeyHexToAddressHex(privateKeyHex string) (string, error) {
-	privateKey, err := crypto.HexToECDSA(privateKeyHex)
-	if err != nil {
-		return "", err
-	}
-	addressHex := crypto.PubkeyToAddress(privateKey.PublicKey).Hex()
-	return addressHex, nil
-}
 
 const ethToWei = float64(1000000000000000000)
 
