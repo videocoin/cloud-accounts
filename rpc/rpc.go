@@ -105,12 +105,43 @@ func (s *RpcServer) GetByAddress(ctx context.Context, req *v1.Address) (*v1.Acco
 	return profile, nil
 }
 
-func (s *RpcServer) Withdraw(ctx context.Context, req *v1.WithdrawRequest) (*protoempty.Empty, error) {
+func (s *RpcServer) CreateTransfer(ctx context.Context, req *v1.CreateTransferRequest) (*v1.TransferResponse, error) {
 	span := opentracing.SpanFromContext(ctx)
-	span.SetTag("owner_id", req.OwnerId)
-	span.SetTag("transfer_id", req.TransferId)
+	span.SetTag("user_id", req.UserId)
+	span.SetTag("to_address", req.ToAddress)
 
-	key, err := s.manager.GetAccountKey(ctx, req.OwnerId)
+	transfer, err := s.manager.CreateTransfer(ctx, req)
+	if err != nil {
+		s.logger.WithError(err).Error("failed to create transfer")
+		return nil, rpc.ErrRpcInternal
+	}
+
+	return transfer, nil
+}
+
+func (s *RpcServer) GetTransfer(ctx context.Context, req *v1.TransferRequest) (*v1.TransferResponse, error) {
+	span := opentracing.SpanFromContext(ctx)
+	span.SetTag("id", req.Id)
+
+	transfer, err := s.manager.GetTransfer(ctx, req)
+	if err != nil {
+		if err == datastore.ErrTransferNotFound {
+			return nil, rpc.ErrRpcNotFound
+		}
+		s.logger.WithError(err).Error("failed to get transfer")
+		return nil, rpc.ErrRpcInternal
+	}
+
+	return transfer, nil
+}
+
+func (s *RpcServer) ExecuteTransfer(ctx context.Context, req *v1.ExecuteTransferRequest) (*protoempty.Empty, error) {
+	span := opentracing.SpanFromContext(ctx)
+	span.SetTag("id", req.Id)
+	span.SetTag("user_id", req.UserId)
+	span.SetTag("user_email", req.UserEmail)
+
+	key, err := s.manager.GetAccountKey(ctx, req.UserId)
 	if err != nil {
 		if err == datastore.ErrAccountNotFound {
 			return nil, rpc.ErrRpcNotFound
@@ -119,7 +150,7 @@ func (s *RpcServer) Withdraw(ctx context.Context, req *v1.WithdrawRequest) (*pro
 		return nil, rpc.ErrRpcInternal
 	}
 
-	s.manager.Withdraw(key, req)
+	s.manager.ExecuteTransfer(ctx, key, req)
 
 	return new(protoempty.Empty), nil
 }

@@ -63,15 +63,14 @@ func (ds *AccountDatastore) Create(ctx context.Context, userID string, passphras
 	return account, nil
 }
 
-func (ds *AccountDatastore) Get(ctx context.Context, accountID string) (*v1.Account, error) {
+func (ds *AccountDatastore) Get(ctx context.Context, id string) (*v1.Account, error) {
 	span, _ := opentracing.StartSpanFromContext(ctx, "Get")
 	defer span.Finish()
 
-	span.SetTag("id", accountID)
+	span.SetTag("id", id)
 
 	account := new(v1.Account)
-
-	if err := ds.db.Where("id = ?", accountID).First(&account).Error; err != nil {
+	if err := ds.db.Where("id = ?", id).First(&account).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return nil, ErrAccountNotFound
 		}
@@ -133,7 +132,7 @@ func (ds *AccountDatastore) List(ctx context.Context) ([]*v1.Account, error) {
 	return accounts, nil
 }
 
-func (ds *AccountDatastore) UpdateBalance(ctx context.Context, account *v1.Account, balance float64) error {
+func (ds *AccountDatastore) UpdateBalance(ctx context.Context, account *v1.Account, balance string) error {
 	span, _ := opentracing.StartSpanFromContext(ctx, "UpdateBalance")
 	defer span.Finish()
 
@@ -145,7 +144,7 @@ func (ds *AccountDatastore) UpdateBalance(ctx context.Context, account *v1.Accou
 		return err
 	}
 
-	account.Balance = balance
+	account.Balance = []byte(balance)
 	account.UpdatedAt = &time
 
 	updates := map[string]interface{}{

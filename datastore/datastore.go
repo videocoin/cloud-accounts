@@ -8,7 +8,6 @@ import (
 type Datastore struct {
 	Account  *AccountDatastore
 	Transfer *TransferDatastore
-	User     *UserDatastore
 }
 
 func NewDatastore(uri string) (*Datastore, error) {
@@ -34,13 +33,6 @@ func NewDatastore(uri string) (*Datastore, error) {
 	}
 
 	ds.Transfer = transfersDs
-
-	userDs, err := NewUserDatastore(db)
-	if err != nil {
-		return nil, err
-	}
-
-	ds.User = userDs
 
 	return ds, nil
 }
