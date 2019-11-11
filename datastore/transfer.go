@@ -136,3 +136,35 @@ func (ds *TransferDatastore) Update(ctx context.Context, transfer *v1.Transfer, 
 
 	return nil
 }
+
+func (ds *TransferDatastore) SetCompleted(ctx context.Context, transfer *v1.Transfer) error {
+	return ds.Update(ctx, transfer, map[string]interface{}{
+		"status": v1.TransferStatusCompleted,
+	})
+}
+
+func (ds *TransferDatastore) SetFailed(ctx context.Context, transfer *v1.Transfer) error {
+	return ds.Update(ctx, transfer, map[string]interface{}{
+		"status": v1.TransferStatusFailed,
+	})
+}
+
+func (ds *TransferDatastore) SetPendingNative(ctx context.Context, transfer *v1.Transfer, hash string) error {
+	return ds.Update(ctx, transfer, map[string]interface{}{
+		"status":       v1.TransferStatusPendingNative,
+		"tx_native_id": hash,
+	})
+}
+
+func (ds *TransferDatastore) SetExecutedNative(ctx context.Context, transfer *v1.Transfer) error {
+	return ds.Update(ctx, transfer, map[string]interface{}{
+		"status": v1.TransferStatusExecutedNative,
+	})
+}
+
+func (ds *TransferDatastore) SetPendingErc20(ctx context.Context, transfer *v1.Transfer, hash string) error {
+	return ds.Update(ctx, transfer, map[string]interface{}{
+		"status":      v1.TransferStatusPendingErc,
+		"tx_erc20_id": hash,
+	})
+}

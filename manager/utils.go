@@ -115,11 +115,6 @@ func execNativeTransaction(client *ethclient.Client, key *keystore.Key, toAddres
 		return nil, fmt.Errorf("failed to send transaction %s: %s", tx.Hash().Hex(), err.Error())
 	}
 
-	err = waitMinedAndCheck(client, signedTx)
-	if err != nil {
-		return nil, fmt.Errorf("failed to mine internal transaction %s: %s", signedTx.Hash().Hex(), err.Error())
-	}
-
 	return signedTx, nil
 }
 
@@ -137,11 +132,6 @@ func execErc20Transaction(client *ethclient.Client, key *keystore.Key, toAddress
 	tx, err := tokenInstance.Transfer(auth, toAddress, amount)
 	if err != nil {
 		return nil, fmt.Errorf("failed to transfer tokens %s: %s", tx.Hash().Hex(), err.Error())
-	}
-
-	err = waitMinedAndCheck(client, tx)
-	if err != nil {
-		return nil, fmt.Errorf("failed to mine erc20 transaction %s: %s", tx.Hash().Hex(), err.Error())
 	}
 
 	return tx, nil

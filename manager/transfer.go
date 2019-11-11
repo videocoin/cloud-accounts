@@ -9,7 +9,6 @@ import (
 	"github.com/jinzhu/copier"
 	"github.com/opentracing/opentracing-go"
 	v1 "github.com/videocoin/cloud-api/accounts/v1"
-	transfersv1 "github.com/videocoin/cloud-api/transfers/v1"
 	"github.com/videocoin/cloud-pkg/tracer"
 )
 
@@ -64,7 +63,7 @@ func (m *Manager) executeTransfer(ctx context.Context, key *v1.AccountKey, req *
 	defer span.Finish()
 
 	isSuccessfull := false
-	failReason := "Unknown reason"
+	failReason := "Unknown error"
 
 	transfer, err := m.ds.Transfer.Get(ctx, req.Id)
 	if err != nil {
@@ -79,16 +78,15 @@ func (m *Manager) executeTransfer(ctx context.Context, key *v1.AccountKey, req *
 
 	defer func() {
 		if !isSuccessfull {
-			if err := m.ds.Transfer.Update(ctx, transfer, map[string]interface{}{"status": transfersv1.TransferStatusFailed}); err != nil {
+			if err := m.ds.Transfer.SetFailed(ctx, transfer); err != nil {
 				m.logger.WithError(err).Error("failed to update transfer")
 			}
 
 			if err := m.nc.SendWithdrawFailed(ctx, req.UserEmail, transfer, failReason); err != nil {
 				m.logger.WithError(err).Error("failed to send withdraw failed email")
 			}
-
 		} else {
-			if err := m.ds.Transfer.Update(ctx, transfer, map[string]interface{}{"status": transfersv1.TransferStatusCompleted}); err != nil {
+			if err := m.ds.Transfer.SetCompleted(ctx, transfer); err != nil {
 				m.logger.WithError(err).Error("failed to update transfer")
 			}
 			if err := m.nc.SendWithdrawSucceeded(ctx, req.UserEmail, transfer); err != nil {
@@ -117,28 +115,43 @@ func (m *Manager) executeTransfer(ctx context.Context, key *v1.AccountKey, req *
 
 	tx, err := execNativeTransaction(m.vdc, userKey, m.bankKey.Address, transferAmount)
 	if err != nil {
-		failReason = "Native transaction failed"
+		failReason = "Failed to perform native transaction"
 		m.logger.Error(err)
 		return
 	}
 
-	if err := m.ds.Transfer.Update(ctx, transfer, map[string]interface{}{
-		"status":       transfersv1.TransferStatusExecutedNative,
-		"tx_native_id": tx.Hash().String()}); err != nil {
+	if err := m.ds.Transfer.SetPendingNative(ctx, transfer, tx.Hash().String()); err != nil {
 		m.logger.WithError(err).Error("failed to update transfer")
+		return
+	}
+
+	if err := waitMinedAndCheck(m.vdc, tx); err != nil {
+		failReason = "Failed to get native transaction receipt"
+		m.logger.WithError(err).Errorf("%s %s", failReason, tx.Hash().Hex())
+		return
+	}
+
+	if err := m.ds.Transfer.SetExecutedNative(ctx, transfer); err != nil {
+		m.logger.WithError(err).Error("failed to update transfer")
+		return
 	}
 
 	tx, err = execErc20Transaction(m.eth, m.bankKey, common.HexToAddress(transfer.ToAddress), common.HexToAddress(m.tokenAddr), transferAmount)
 	if err != nil {
-		failReason = "Erc20 transaction failed"
+		failReason = "Failed to perform erc20 transaction"
 		m.logger.Error(err)
 		return
 	}
 
-	if err := m.ds.Transfer.Update(ctx, transfer, map[string]interface{}{
-		"status":      transfersv1.TransferStatusExecutedNative,
-		"tx_erc20_id": tx.Hash().String()}); err != nil {
+	if err := m.ds.Transfer.SetPendingErc20(ctx, transfer, tx.Hash().String()); err != nil {
 		m.logger.WithError(err).Error("failed to update transfer")
+		return
+	}
+
+	if err = waitMinedAndCheck(m.eth, tx); err != nil {
+		failReason = "Failed to get erc20 transaction receipt"
+		m.logger.WithError(err).Errorf("%s %s", failReason, tx.Hash().Hex())
+		return
 	}
 
 	isSuccessfull = true
