@@ -72,7 +72,11 @@ func (m *Manager) executeTransfer(ctx context.Context, key *v1.AccountKey, req *
 	}
 
 	transferAmount := new(big.Int)
-	transferAmount, _ = transferAmount.SetString(string(transfer.Amount), 10)
+	transferAmount, ok := transferAmount.SetString(string(transfer.Amount), 10)
+	if !ok {
+		m.logger.WithError(err).Errorf("failed to convert transfer amount: %v", transfer)
+		return
+	}
 
 	m.logger.WithField("to_address", transfer.ToAddress).WithField("amount", transferAmount.Uint64()).Info("starting withdraw procedure")
 
