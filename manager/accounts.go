@@ -62,18 +62,15 @@ func (m *Manager) GetAccountById(ctx context.Context, id string) (*v1.AccountPro
 		return nil, err
 	}
 
-	err = m.refreshBalance(ctx, account)
+	balance, err := m.refreshBalance(ctx, account)
 	if err != nil {
 		m.logger.WithError(err).Errorf("failed to refresh account %s balance", account.Id)
 		tracer.SpanLogError(span, err)
 	}
 
-	balance := new(big.Int)
-	balance, _ = balance.SetString(string(account.Balance), 10)
-
 	return &v1.AccountProfile{
 		Address: account.Address,
-		Balance: balance.String(),
+		Balance: balance,
 	}, nil
 }
 
@@ -87,18 +84,15 @@ func (m *Manager) GetAccountByOwner(ctx context.Context, ownerID string) (*v1.Ac
 		return nil, err
 	}
 
-	err = m.refreshBalance(ctx, account)
+	balance, err := m.refreshBalance(ctx, account)
 	if err != nil {
 		m.logger.WithError(err).Errorf("failed to refresh account %s balance", account.Id)
 		tracer.SpanLogError(span, err)
 	}
 
-	balance := new(big.Int)
-	balance, _ = balance.SetString(string(account.Balance), 10)
-
 	return &v1.AccountProfile{
 		Address: account.Address,
-		Balance: balance.String(),
+		Balance: balance,
 	}, nil
 }
 
@@ -112,18 +106,15 @@ func (m *Manager) GetAccountByAddress(ctx context.Context, address string) (*v1.
 		return nil, err
 	}
 
-	err = m.refreshBalance(ctx, account)
+	balance, err := m.refreshBalance(ctx, account)
 	if err != nil {
 		m.logger.WithError(err).Errorf("failed to refresh account %s balance", account.Id)
 		tracer.SpanLogError(span, err)
 	}
 
-	balance := new(big.Int)
-	balance, _ = balance.SetString(string(account.Balance), 10)
-
 	return &v1.AccountProfile{
 		Address: account.Address,
-		Balance: balance.String(),
+		Balance: balance,
 	}, nil
 }
 
@@ -147,20 +138,20 @@ func (m *Manager) GetAccountKey(ctx context.Context, ownerID string) (*v1.Accoun
 	return key, nil
 }
 
-func (m *Manager) refreshBalance(ctx context.Context, account *v1.Account) error {
+func (m *Manager) refreshBalance(ctx context.Context, account *v1.Account) (string, error) {
 	span, _ := opentracing.StartSpanFromContext(ctx, "manager.refreshBalance")
 	defer span.Finish()
 
 	address := common.HexToAddress(account.Address)
 	balance, err := m.vdc.BalanceAt(context.Background(), address, nil)
 	if err != nil {
-		return err
+		return "0", err
 	}
 
 	if err = m.ds.Account.UpdateBalance(ctx, account, balance.String()); err != nil {
 		tracer.SpanLogError(span, err)
-		return err
+		return "0", err
 	}
 
-	return nil
+	return balance.String(), nil
 }
