@@ -42,11 +42,13 @@ func (m *Manager) ListAccounts(ctx context.Context) ([]*v1.AccountProfile, error
 
 	profiles := make([]*v1.AccountProfile, len(accounts))
 	for i, account := range accounts {
-		profiles[i].Address = account.Address
-
 		balance := new(big.Int)
 		balance, _ = balance.SetString(string(account.Balance), 10)
-		profiles[i].Balance = balance.String()
+
+		profiles[i] = &v1.AccountProfile{
+			Address: account.Address,
+			Balance: balance.String(),
+		}
 	}
 
 	return profiles, nil
