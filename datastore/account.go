@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"math/big"
 
 	"github.com/golang/protobuf/ptypes"
 	"github.com/jinzhu/gorm"
@@ -132,7 +133,7 @@ func (ds *AccountDatastore) List(ctx context.Context) ([]*v1.Account, error) {
 	return accounts, nil
 }
 
-func (ds *AccountDatastore) UpdateBalance(ctx context.Context, account *v1.Account, balance string) error {
+func (ds *AccountDatastore) UpdateBalance(ctx context.Context, account *v1.Account, balance *big.Int) error {
 	span, _ := opentracing.StartSpanFromContext(ctx, "UpdateBalance")
 	defer span.Finish()
 
@@ -144,12 +145,12 @@ func (ds *AccountDatastore) UpdateBalance(ctx context.Context, account *v1.Accou
 		return err
 	}
 
-	account.Balance = []byte(balance)
+	account.BalanceWei = balance.String()
 	account.UpdatedAt = &time
 
 	updates := map[string]interface{}{
-		"balance":   account.Balance,
-		"updatedAt": account.UpdatedAt,
+		"balance_wei": account.BalanceWei,
+		"updatedAt":   account.UpdatedAt,
 	}
 
 	if err = ds.db.Model(account).Updates(updates).Error; err != nil {

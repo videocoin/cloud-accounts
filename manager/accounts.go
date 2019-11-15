@@ -2,7 +2,6 @@ package manager
 
 import (
 	"context"
-	"math/big"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/jinzhu/copier"
@@ -21,12 +20,9 @@ func (m *Manager) CreateAccount(ctx context.Context, req *v1.AccountRequest) (*v
 		return nil, err
 	}
 
-	balance := new(big.Int)
-	balance, _ = balance.SetString(string(account.Balance), 10)
-
 	return &v1.AccountProfile{
 		Address: account.Address,
-		Balance: balance.String(),
+		Balance: "0",
 	}, nil
 }
 
@@ -42,12 +38,9 @@ func (m *Manager) ListAccounts(ctx context.Context) ([]*v1.AccountProfile, error
 
 	profiles := make([]*v1.AccountProfile, len(accounts))
 	for i, account := range accounts {
-		balance := new(big.Int)
-		balance, _ = balance.SetString(string(account.Balance), 10)
-
 		profiles[i] = &v1.AccountProfile{
 			Address: account.Address,
-			Balance: balance.String(),
+			Balance: account.BalanceWei,
 		}
 	}
 
@@ -150,7 +143,7 @@ func (m *Manager) refreshBalance(ctx context.Context, account *v1.Account) (stri
 		return "0", err
 	}
 
-	if err = m.ds.Account.UpdateBalance(ctx, account, balance.String()); err != nil {
+	if err = m.ds.Account.UpdateBalance(ctx, account, balance); err != nil {
 		tracer.SpanLogError(span, err)
 		return "0", err
 	}
