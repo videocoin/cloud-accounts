@@ -126,7 +126,7 @@ func execErc20Transaction(client *ethclient.Client, key *keystore.Key, toAddress
 
 	auth := bind.NewKeyedTransactor(key.PrivateKey)
 	auth.Value = big.NewInt(0)
-	auth.GasPrice = big.NewInt(10000000000)
+	auth.GasPrice = big.NewInt(2000000000)
 
 	// transfer erc tokens to user on ethereum net
 	tx, err := tokenInstance.Transfer(auth, toAddress, amount)
