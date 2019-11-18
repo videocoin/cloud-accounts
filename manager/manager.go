@@ -1,6 +1,10 @@
 package manager
 
 import (
+	"context"
+	"sync"
+	"time"
+
 	"github.com/ethereum/go-ethereum/accounts/keystore"
 	ec "github.com/ethereum/go-ethereum/ethclient"
 	"github.com/sirupsen/logrus"
@@ -35,6 +39,10 @@ type Manager struct {
 	ds     *datastore.Datastore
 	nc     *n.NotificationClient
 	logger *logrus.Entry
+
+	bTicker  *time.Ticker
+	bTimeout time.Duration
+	rbLock   sync.Mutex
 }
 
 func NewManager(opts *ManagerOpts) (*Manager, error) {
@@ -49,6 +57,8 @@ func NewManager(opts *ManagerOpts) (*Manager, error) {
 		return nil, err
 	}
 
+	bTimeout := 10 * time.Second
+
 	return &Manager{
 		eth:          opts.Eth,
 		vdc:          opts.Vdc,
@@ -58,5 +68,51 @@ func NewManager(opts *ManagerOpts) (*Manager, error) {
 		ds:           opts.Ds,
 		nc:           nc,
 		logger:       opts.Logger,
+		bTimeout:     bTimeout,
+		bTicker:      time.NewTicker(bTimeout),
 	}, nil
+}
+
+func (m *Manager) StartBackgroundTasks() error {
+	go m.startRefreshBalanceTask()
+	return nil
+}
+
+func (m *Manager) StopBackgroundTasks() error {
+	m.bTicker.Stop()
+	return nil
+}
+
+func (m *Manager) startRefreshBalanceTask() error {
+	for {
+		select {
+		case <-m.bTicker.C:
+			m.rbLock.Lock()
+
+			m.logger.Info("refresh balance")
+
+			ctx := context.Background()
+			accounts, err := m.ds.Account.List(ctx)
+			if err != nil {
+				m.logger.Error(err)
+				time.Sleep(time.Second * 5)
+				continue
+			}
+
+			for _, account := range accounts {
+				logger := m.logger.WithField("id", account.Id)
+				logger.Info("refreshing balance")
+
+				_, err := m.refreshBalance(ctx, account)
+				if err != nil {
+					logger.WithError(err).Errorf("failed to refresh account %s balance", account.Id)
+					continue
+				}
+			}
+
+			m.rbLock.Unlock()
+		}
+	}
+
+	return nil
 }

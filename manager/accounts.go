@@ -57,15 +57,9 @@ func (m *Manager) GetAccountById(ctx context.Context, id string) (*v1.AccountPro
 		return nil, err
 	}
 
-	balance, err := m.refreshBalance(ctx, account)
-	if err != nil {
-		m.logger.WithError(err).Errorf("failed to refresh account %s balance", account.Id)
-		tracer.SpanLogError(span, err)
-	}
-
 	return &v1.AccountProfile{
 		Address: account.Address,
-		Balance: balance,
+		Balance: account.BalanceWei,
 	}, nil
 }
 
@@ -79,15 +73,9 @@ func (m *Manager) GetAccountByOwner(ctx context.Context, ownerID string) (*v1.Ac
 		return nil, err
 	}
 
-	balance, err := m.refreshBalance(ctx, account)
-	if err != nil {
-		m.logger.WithError(err).Errorf("failed to refresh account %s balance", account.Id)
-		tracer.SpanLogError(span, err)
-	}
-
 	return &v1.AccountProfile{
 		Address: account.Address,
-		Balance: balance,
+		Balance: account.BalanceWei,
 	}, nil
 }
 
@@ -101,15 +89,9 @@ func (m *Manager) GetAccountByAddress(ctx context.Context, address string) (*v1.
 		return nil, err
 	}
 
-	balance, err := m.refreshBalance(ctx, account)
-	if err != nil {
-		m.logger.WithError(err).Errorf("failed to refresh account %s balance", account.Id)
-		tracer.SpanLogError(span, err)
-	}
-
 	return &v1.AccountProfile{
 		Address: account.Address,
-		Balance: balance,
+		Balance: account.BalanceWei,
 	}, nil
 }
 
