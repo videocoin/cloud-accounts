@@ -5,11 +5,11 @@ import (
 	"errors"
 	"fmt"
 	"math/big"
+	"time"
 
 	"github.com/golang/protobuf/ptypes"
 	"github.com/jinzhu/gorm"
 	"github.com/opentracing/opentracing-go"
-	v1 "github.com/videocoin/cloud-api/accounts/v1"
 	"github.com/videocoin/cloud-pkg/uuid4"
 )
 
@@ -22,11 +22,20 @@ type AccountDatastore struct {
 }
 
 func NewAccountDatastore(db *gorm.DB) (*AccountDatastore, error) {
-	db.AutoMigrate(&v1.Account{})
 	return &AccountDatastore{db: db}, nil
 }
 
-func (ds *AccountDatastore) Create(ctx context.Context, userID string, passphrase string) (*v1.Account, error) {
+type Account struct {
+	Id         string     `gorm:"type:varchar(36);PRIMARY_KEY"`
+	UserId     string     `gorm:"type:varchar(255);DEFAULT:null"`
+	Address    string     `gorm:"type:varchar(42);DEFAULT:null"`
+	Key        string     `gorm:"type:varchar(42);DEFAULT:null"`
+	UpdatedAt  *time.Time `gorm:"type:timestamp NULL;DEFAULT:null"`
+	Balance    string     `gorm:"type:double;DEFAULT:null"`
+	BalanceWei string     `gorm:"type:varchar(255);DEFAULT:null"`
+}
+
+func (ds *AccountDatastore) Create(ctx context.Context, userID string, passphrase string) (*Account, error) {
 	span, _ := opentracing.StartSpanFromContext(ctx, "Create")
 	defer span.Finish()
 
@@ -46,7 +55,7 @@ func (ds *AccountDatastore) Create(ctx context.Context, userID string, passphras
 		return nil, err
 	}
 
-	account := &v1.Account{
+	account := &Account{
 		Id:      id,
 		UserId:  userID,
 		Address: key.Address,
@@ -64,13 +73,13 @@ func (ds *AccountDatastore) Create(ctx context.Context, userID string, passphras
 	return account, nil
 }
 
-func (ds *AccountDatastore) Get(ctx context.Context, id string) (*v1.Account, error) {
+func (ds *AccountDatastore) Get(ctx context.Context, id string) (*Account, error) {
 	span, _ := opentracing.StartSpanFromContext(ctx, "Get")
 	defer span.Finish()
 
 	span.SetTag("id", id)
 
-	account := new(v1.Account)
+	account := new(Account)
 	if err := ds.db.Where("id = ?", id).First(&account).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return nil, ErrAccountNotFound
@@ -82,13 +91,13 @@ func (ds *AccountDatastore) Get(ctx context.Context, id string) (*v1.Account, er
 	return account, nil
 }
 
-func (ds *AccountDatastore) GetByOwner(ctx context.Context, userID string) (*v1.Account, error) {
+func (ds *AccountDatastore) GetByOwner(ctx context.Context, userID string) (*Account, error) {
 	span, _ := opentracing.StartSpanFromContext(ctx, "GetByOwner")
 	defer span.Finish()
 
 	span.SetTag("owner_id", userID)
 
-	account := new(v1.Account)
+	account := new(Account)
 
 	if err := ds.db.Where("user_id = ?", userID).First(&account).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
@@ -101,13 +110,13 @@ func (ds *AccountDatastore) GetByOwner(ctx context.Context, userID string) (*v1.
 	return account, nil
 }
 
-func (ds *AccountDatastore) GetByAddress(ctx context.Context, address string) (*v1.Account, error) {
+func (ds *AccountDatastore) GetByAddress(ctx context.Context, address string) (*Account, error) {
 	span, _ := opentracing.StartSpanFromContext(ctx, "GetByAddress")
 	defer span.Finish()
 
 	span.SetTag("address", address)
 
-	account := new(v1.Account)
+	account := new(Account)
 
 	if err := ds.db.Where("address = ?", address).First(&account).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
@@ -120,11 +129,11 @@ func (ds *AccountDatastore) GetByAddress(ctx context.Context, address string) (*
 	return account, nil
 }
 
-func (ds *AccountDatastore) List(ctx context.Context) ([]*v1.Account, error) {
+func (ds *AccountDatastore) List(ctx context.Context) ([]*Account, error) {
 	span, _ := opentracing.StartSpanFromContext(ctx, "List")
 	defer span.Finish()
 
-	accounts := []*v1.Account{}
+	accounts := []*Account{}
 
 	if err := ds.db.Find(&accounts).Error; err != nil {
 		return nil, fmt.Errorf("failed to get accounts list: %s", err)
