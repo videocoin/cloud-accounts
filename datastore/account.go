@@ -133,29 +133,37 @@ func (ds *AccountDatastore) List(ctx context.Context) ([]*v1.Account, error) {
 	return accounts, nil
 }
 
-func (ds *AccountDatastore) UpdateBalance(ctx context.Context, account *v1.Account, balance *big.Int) error {
-	span, _ := opentracing.StartSpanFromContext(ctx, "UpdateBalance")
-	defer span.Finish()
+func (ds *AccountDatastore) Update(ctx context.Context, account *v1.Account, updates map[string]interface{}) error {
+	span, _ := opentracing.StartSpanFromContext(ctx, "Update")
+	span.SetTag("updates", updates)
 
-	span.SetTag("account_id", account.Id)
-	span.SetTag("balance", balance)
+	if err := ds.db.Model(account).Updates(updates).Error; err != nil {
+		return fmt.Errorf("failed to update account: %s", err)
+	}
 
+	return nil
+}
+
+func (ds *AccountDatastore) SetBalance(ctx context.Context, account *v1.Account, balance *big.Int) error {
 	time, err := ptypes.Timestamp(ptypes.TimestampNow())
 	if err != nil {
 		return err
 	}
 
-	account.BalanceWei = balance.String()
-	account.UpdatedAt = &time
+	return ds.Update(ctx, account, map[string]interface{}{
+		"balance_wei": balance.String(),
+		"updated_at":  &time,
+	})
+}
 
-	updates := map[string]interface{}{
-		"balance_wei": account.BalanceWei,
-		"updatedAt":   account.UpdatedAt,
-	}
+func (ds *AccountDatastore) Lock(ctx context.Context, account *v1.Account) error {
+	return ds.Update(ctx, account, map[string]interface{}{
+		"is_locked": true,
+	})
+}
 
-	if err = ds.db.Model(account).Updates(updates).Error; err != nil {
-		return err
-	}
-
-	return nil
+func (ds *AccountDatastore) Unlock(ctx context.Context, account *v1.Account) error {
+	return ds.Update(ctx, account, map[string]interface{}{
+		"is_locked": false,
+	})
 }

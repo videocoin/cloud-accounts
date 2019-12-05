@@ -57,7 +57,7 @@ func NewManager(opts *ManagerOpts) (*Manager, error) {
 		return nil, err
 	}
 
-	bTimeout := 10 * time.Second
+	bTimeout := 60 * time.Second
 
 	return &Manager{
 		eth:          opts.Eth,

@@ -125,7 +125,7 @@ func (m *Manager) refreshBalance(ctx context.Context, account *v1.Account) (stri
 		return "0", err
 	}
 
-	if err = m.ds.Account.UpdateBalance(ctx, account, balance); err != nil {
+	if err = m.ds.Account.SetBalance(ctx, account, balance); err != nil {
 		tracer.SpanLogError(span, err)
 		return "0", err
 	}

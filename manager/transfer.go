@@ -78,9 +78,18 @@ func (m *Manager) executeTransfer(ctx context.Context, key *v1.AccountKey, req *
 		return
 	}
 
-	m.logger.WithField("to_address", transfer.ToAddress).WithField("amount", transferAmount.Uint64()).Info("starting withdraw procedure")
+	m.logger.
+		WithField("to_address", transfer.ToAddress).
+		WithField("amount", transferAmount.Uint64()).
+		Info("starting withdraw procedure")
 
 	defer func() {
+		if err := m.ds.Account.Unlock(ctx, &v1.Account{
+			Id: req.Id,
+		}); err != nil {
+			m.logger.WithError(err).Error("failed to unlock account")
+		}
+
 		if !isSuccessfull {
 			if err := m.ds.Transfer.SetFailed(ctx, transfer); err != nil {
 				m.logger.WithError(err).Error("failed to update transfer")
@@ -99,6 +108,14 @@ func (m *Manager) executeTransfer(ctx context.Context, key *v1.AccountKey, req *
 		}
 	}()
 
+	if err := m.ds.Account.Lock(ctx, &v1.Account{
+		Id: req.Id,
+	}); err != nil {
+		failReason = "Failed to lock account"
+		m.logger.WithError(err).Error("failed to lock account")
+		return
+	}
+
 	userKey, err := keystore.DecryptKey([]byte(key.Key), m.clientSecret)
 	if err != nil {
 		m.logger.Error(err)
@@ -106,13 +123,13 @@ func (m *Manager) executeTransfer(ctx context.Context, key *v1.AccountKey, req *
 	}
 
 	if err = checkUserBalance(m.vdc, userKey.Address, transferAmount); err != nil {
-		failReason = "Unsufficient user balance"
+		failReason = "Insufficient user balance"
 		m.logger.Error(err)
 		return
 	}
 
 	if err = checkBankBalance(m.eth, m.bankKey.Address, common.HexToAddress(m.tokenAddr), transferAmount); err != nil {
-		failReason = "Unsufficient bank balance"
+		failReason = "Insufficient bank balance"
 		m.logger.Error(err)
 		return
 	}

@@ -54,8 +54,6 @@ func checkBankBalance(client *ethclient.Client, address, tokenAddr common.Addres
 		return fmt.Errorf("failed to get bank token balance: %s", err.Error())
 	}
 
-	fmt.Printf("bank %s token balance is %d\n", address, bankTokenBalance.Int64())
-
 	// check the bank has enough erc tokens to perform the refund; if not, raise alert and fund our bank account
 	if bankTokenBalance.Cmp(transferAmount) < 0 {
 		return ErrBankErcBalanceInsufficient

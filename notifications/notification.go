@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-	"fmt"
 	"math/big"
 
 	"github.com/grpc-ecosystem/go-grpc-middleware/util/metautils"
@@ -34,11 +33,12 @@ func (c *NotificationClient) SendWithdrawSucceeded(ctx context.Context, to strin
 
 	amount := new(big.Int)
 	amount, _ = amount.SetString(string(transfer.Amount), 10)
+	vdc, _ := ethutils.WeiToEth(amount)
 
 	params := map[string]string{
 		"to":      to,
 		"address": transfer.ToAddress,
-		"amount":  fmt.Sprintf("%f", ethutils.WeiToEth(amount)),
+		"amount":  vdc.String(),
 		"tx":      string(transfer.TxErc20Id),
 		"domain":  md.Get("x-forwarded-host"),
 	}
@@ -65,11 +65,12 @@ func (c *NotificationClient) SendWithdrawFailed(ctx context.Context, to string, 
 
 	amount := new(big.Int)
 	amount, _ = amount.SetString(string(transfer.Amount), 10)
+	vdc, _ := ethutils.WeiToEth(amount)
 
 	params := map[string]string{
 		"to":      to,
 		"address": transfer.ToAddress,
-		"amount":  fmt.Sprintf("%f", ethutils.WeiToEth(amount)),
+		"amount":  vdc.String(),
 		"reason":  reason,
 		"domain":  md.Get("x-forwarded-host"),
 	}
