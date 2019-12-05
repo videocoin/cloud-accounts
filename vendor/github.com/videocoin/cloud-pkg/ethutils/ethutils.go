@@ -20,14 +20,13 @@ func EthToWei(ether float64) *big.Int {
 }
 
 // WeiToEth converts from Wei to ETH
-func WeiToEth(wei *big.Int) float64 {
-	eth := big.NewInt(1000000000000000000)
-	if wei.Cmp(eth) == 1 {
-		var result big.Int
-		result.Div(wei, eth)
-		return float64(result.Int64())
-	}
-	return float64(wei.Uint64()) / ethToWei
+func WeiToEth(wei *big.Int) (*big.Float, error) {
+	var factor, exp = big.NewInt(18), big.NewInt(10)
+	exp = exp.Exp(exp, factor, nil)
+
+	fwei := new(big.Float).SetInt(wei)
+
+	return new(big.Float).Quo(fwei, new(big.Float).SetInt(exp)), nil
 }
 
 // ParseInt64 parse hex string value to int64
