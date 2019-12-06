@@ -9,6 +9,7 @@ import (
 	"github.com/jinzhu/copier"
 	"github.com/opentracing/opentracing-go"
 	v1 "github.com/videocoin/cloud-api/accounts/v1"
+	ds "github.com/videocoin/cloud-accounts/datastore"
 	"github.com/videocoin/cloud-pkg/tracer"
 )
 
@@ -84,7 +85,7 @@ func (m *Manager) executeTransfer(ctx context.Context, key *v1.AccountKey, req *
 		Info("starting withdraw procedure")
 
 	defer func() {
-		if err := m.ds.Account.Unlock(ctx, &v1.Account{
+		if err := m.ds.Account.Unlock(ctx, &ds.Account{
 			Id: req.Id,
 		}); err != nil {
 			m.logger.WithError(err).Error("failed to unlock account")
@@ -108,7 +109,7 @@ func (m *Manager) executeTransfer(ctx context.Context, key *v1.AccountKey, req *
 		}
 	}()
 
-	if err := m.ds.Account.Lock(ctx, &v1.Account{
+	if err := m.ds.Account.Lock(ctx, &ds.Account{
 		Id: req.Id,
 	}); err != nil {
 		failReason = "Failed to lock account"

@@ -7,9 +7,8 @@ import (
 	"time"
 
 	"github.com/golang/protobuf/ptypes"
-	opentracing "github.com/opentracing/opentracing-go"
-
 	"github.com/jinzhu/gorm"
+	opentracing "github.com/opentracing/opentracing-go"
 	v1 "github.com/videocoin/cloud-api/transfers/v1"
 	"github.com/videocoin/cloud-pkg/uuid4"
 )

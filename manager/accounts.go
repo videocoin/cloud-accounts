@@ -6,6 +6,7 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/jinzhu/copier"
 	"github.com/opentracing/opentracing-go"
+	ds "github.com/videocoin/cloud-accounts/datastore"
 	v1 "github.com/videocoin/cloud-api/accounts/v1"
 	"github.com/videocoin/cloud-pkg/tracer"
 )
@@ -135,7 +136,7 @@ func (m *Manager) GetAccountKeys(ctx context.Context) ([]*v1.AccountKey, error) 
 	return keys, nil
 }
 
-func (m *Manager) refreshBalance(ctx context.Context, account *v1.Account) (string, error) {
+func (m *Manager) refreshBalance(ctx context.Context, account *ds.Account) (string, error) {
 	span, _ := opentracing.StartSpanFromContext(ctx, "manager.refreshBalance")
 	defer span.Finish()
 
