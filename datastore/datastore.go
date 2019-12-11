@@ -18,7 +18,7 @@ func NewDatastore(uri string) (*Datastore, error) {
 		return nil, err
 	}
 
-	db.LogMode(true)
+	//db.LogMode(true)
 
 	accountsDs, err := NewAccountDatastore(db)
 	if err != nil {

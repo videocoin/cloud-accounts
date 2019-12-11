@@ -89,8 +89,6 @@ func (m *Manager) startRefreshBalanceTask() error {
 		case <-m.bTicker.C:
 			m.rbLock.Lock()
 
-			m.logger.Info("refresh balance")
-
 			ctx := context.Background()
 			accounts, err := m.ds.Account.List(ctx)
 			if err != nil {
@@ -100,12 +98,8 @@ func (m *Manager) startRefreshBalanceTask() error {
 			}
 
 			for _, account := range accounts {
-				logger := m.logger.WithField("id", account.Id)
-				logger.Info("refreshing balance")
-
 				_, err := m.refreshBalance(ctx, account)
 				if err != nil {
-					logger.WithError(err).Errorf("failed to refresh account %s balance", account.Id)
 					continue
 				}
 			}
