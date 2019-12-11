@@ -123,9 +123,14 @@ func (m *Manager) executeTransfer(ctx context.Context, key *v1.AccountKey, req *
 	}
 
 	if err = checkUserBalance(m.vdc, userKey.Address, transferAmount); err != nil {
-		failReason = "Insufficient user balance"
 		m.logger.Error(err)
-		return
+		if err == ErrBankErcBalanceGasInsufficient {
+			feeAmount := big.NewInt(1000000000000000000)
+			transferAmount = big.NewInt(0).Sub(transferAmount, feeAmount)
+		} else {
+			failReason = "Insufficient user balance"
+			return
+		}
 	}
 
 	if err = checkBankBalance(m.eth, m.bankKey.Address, common.HexToAddress(m.tokenAddr), transferAmount); err != nil {
