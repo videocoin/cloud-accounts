@@ -115,6 +115,26 @@ func (m *Manager) GetAccountKey(ctx context.Context, ownerID string) (*v1.Accoun
 	return key, nil
 }
 
+func (m *Manager) GetAccountKeys(ctx context.Context) ([]*v1.AccountKey, error) {
+	span, _ := opentracing.StartSpanFromContext(ctx, "manager.GetAccountKeys")
+	defer span.Finish()
+
+	accounts, err := m.ds.Account.List(ctx)
+	if err != nil {
+		tracer.SpanLogError(span, err)
+		return nil, err
+	}
+
+	keys := make([]*v1.AccountKey, len(accounts))
+	for i, account := range accounts {
+		keys[i] = &v1.AccountKey{
+			Key: account.Key,
+		}
+	}
+
+	return keys, nil
+}
+
 func (m *Manager) refreshBalance(ctx context.Context, account *v1.Account) (string, error) {
 	span, _ := opentracing.StartSpanFromContext(ctx, "manager.refreshBalance")
 	defer span.Finish()

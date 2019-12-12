@@ -3,6 +3,8 @@ module github.com/videocoin/cloud-accounts
 go 1.12
 
 require (
+	github.com/cespare/cp v1.1.1 // indirect
+	github.com/edsrzf/mmap-go v1.0.0 // indirect
 	github.com/ethereum/go-ethereum v1.8.27
 	github.com/gogo/protobuf v1.3.1
 	github.com/golang/protobuf v1.3.1

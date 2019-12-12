@@ -38,3 +38,7 @@ message AccountKey {
     string address = 2;
     string key = 3;
 }
+
+message AccountKeys {
+    repeated AccountKey items = 1;
+}

@@ -54,6 +54,20 @@ func (s *RpcServer) Key(ctx context.Context, req *v1.AccountRequest) (*v1.Accoun
 	return key, nil
 }
 
+func (s *RpcServer) Keys(ctx context.Context, req *protoempty.Empty) (*v1.AccountKeys, error) {
+	_ = opentracing.SpanFromContext(ctx)
+
+	keys, err := s.manager.GetAccountKeys(ctx)
+	if err != nil {
+		logFailedTo(s.logger, "get account keys", err)
+		return nil, rpc.ErrRpcInternal
+	}
+
+	return &v1.AccountKeys{
+		Items: keys,
+	}, nil
+}
+
 func (s *RpcServer) Get(ctx context.Context, req *v1.AccountRequest) (*v1.AccountProfile, error) {
 	span := opentracing.SpanFromContext(ctx)
 	span.SetTag("id", req.Id)
