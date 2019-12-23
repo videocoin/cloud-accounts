@@ -17,7 +17,7 @@ import (
 
 var (
 	ErrUserNativeBalanceInsufficient    = errors.New("user native balance insufficient")
-	ErrUserNativeBalanceGasInsufficient = errors.New("user native balance gas insufficient")
+	ErrUserNativeBalanceFeeInsufficient = errors.New("user native balance fee insufficient")
 	ErrBankErcBalanceInsufficient       = errors.New("bank erc balance insufficient")
 	ErrBankErcBalanceGasInsufficient    = errors.New("bank erc balance gas insufficient")
 )
@@ -33,16 +33,12 @@ func checkUserBalance(client *ethclient.Client, address common.Address, transfer
 		return ErrUserNativeBalanceInsufficient
 	}
 
-	gasCostEstimate := big.NewInt(1000000000000000000)
-	// check user has enough funds to cover fee
-	if userNativeBalance.Cmp(gasCostEstimate) < 0 {
-		return ErrUserNativeBalanceInsufficient
-	}
+	// eth tx fee including gas for native tx, 1 VID
+	feeAmount := big.NewInt(1000000000000000000)
 
-	// check user has enough gas to perform the refund
-	minBalance := gasCostEstimate.Add(gasCostEstimate, transferAmount)
-	if userNativeBalance.Cmp(minBalance) < 0 {
-		return ErrUserNativeBalanceGasInsufficient
+	// check user has enough balance to cover fee
+	if userNativeBalance.Cmp(feeAmount) <= 0 {
+		return ErrUserNativeBalanceFeeInsufficient
 	}
 
 	return nil
@@ -70,7 +66,7 @@ func checkBankBalance(client *ethclient.Client, address, tokenAddr common.Addres
 	}
 
 	// check that the bank actually has enough eth to cover gas cost for withdrawal tx
-	gasCostEstimate := big.NewInt(1000000000000000000)
+	gasCostEstimate := big.NewInt(100000000000000000)
 	if bankEthBalance.Cmp(gasCostEstimate) < 0 {
 		return ErrBankErcBalanceGasInsufficient
 	}
@@ -100,7 +96,9 @@ func execNativeTransaction(client *ethclient.Client, key *keystore.Key, toAddres
 		return nil, fmt.Errorf("failed to get nonce: %s", err.Error())
 	}
 
-	tx := types.NewTransaction(nonce, toAddress, amount, uint64(90000), big.NewInt(47619047619000), nil)
+	fmt.Printf("creating tx of %d amount\n", amount.Uint64())
+
+	tx := types.NewTransaction(nonce, toAddress, amount, uint64(21000), big.NewInt(5000000000), nil)
 
 	// chainID, err := client.ChainID(context.Background())
 	// if err != nil {
@@ -129,7 +127,7 @@ func execErc20Transaction(client *ethclient.Client, key *keystore.Key, toAddress
 
 	auth := bind.NewKeyedTransactor(key.PrivateKey)
 	auth.Value = big.NewInt(0)
-	auth.GasPrice = big.NewInt(3000000000)
+	auth.GasPrice = big.NewInt(5000000000)
 
 	// transfer erc tokens to user on ethereum net
 	tx, err := tokenInstance.Transfer(auth, toAddress, amount)

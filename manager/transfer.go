@@ -81,7 +81,7 @@ func (m *Manager) executeTransfer(ctx context.Context, key *v1.AccountKey, req *
 
 	m.logger.
 		WithField("to_address", transfer.ToAddress).
-		WithField("amount", transferAmount.Uint64()).
+		WithField("amount", transferAmount).
 		Info("starting withdraw procedure")
 
 	defer func() {
@@ -125,13 +125,13 @@ func (m *Manager) executeTransfer(ctx context.Context, key *v1.AccountKey, req *
 
 	if err = checkUserBalance(m.vdc, userKey.Address, transferAmount); err != nil {
 		m.logger.Error(err)
-		if err == ErrBankErcBalanceGasInsufficient {
-			feeAmount := big.NewInt(1000000000000000000)
-			transferAmount = big.NewInt(0).Sub(transferAmount, feeAmount)
-		} else {
-			failReason = "Insufficient user balance"
-			return
+		if err == ErrUserNativeBalanceFeeInsufficient {
+			failReason = "Insufficient funds to cover transfer fee"
+		} else if err == ErrUserNativeBalanceInsufficient {
+			failReason = "Insufficient funds to cover transfer"
 		}
+
+		return
 	}
 
 	if err = checkBankBalance(m.eth, m.bankKey.Address, common.HexToAddress(m.tokenAddr), transferAmount); err != nil {
@@ -162,6 +162,9 @@ func (m *Manager) executeTransfer(ctx context.Context, key *v1.AccountKey, req *
 		m.logger.WithError(err).Error("failed to update transfer")
 		return
 	}
+
+	feeAmount := big.NewInt(1000000000000000000)
+	transferAmount = transferAmount.Sub(transferAmount, feeAmount)
 
 	tx, err = execErc20Transaction(m.eth, m.bankKey, common.HexToAddress(transfer.ToAddress), common.HexToAddress(m.tokenAddr), transferAmount)
 	if err != nil {
