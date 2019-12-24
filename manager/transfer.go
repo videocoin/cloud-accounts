@@ -8,8 +8,8 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/jinzhu/copier"
 	"github.com/opentracing/opentracing-go"
-	v1 "github.com/videocoin/cloud-api/accounts/v1"
 	ds "github.com/videocoin/cloud-accounts/datastore"
+	v1 "github.com/videocoin/cloud-api/accounts/v1"
 	"github.com/videocoin/cloud-pkg/tracer"
 )
 
@@ -162,9 +162,6 @@ func (m *Manager) executeTransfer(ctx context.Context, key *v1.AccountKey, req *
 		m.logger.WithError(err).Error("failed to update transfer")
 		return
 	}
-
-	feeAmount := big.NewInt(1000000000000000000)
-	transferAmount = transferAmount.Sub(transferAmount, feeAmount)
 
 	tx, err = execErc20Transaction(m.eth, m.bankKey, common.HexToAddress(transfer.ToAddress), common.HexToAddress(m.tokenAddr), transferAmount)
 	if err != nil {

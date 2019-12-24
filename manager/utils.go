@@ -33,11 +33,14 @@ func checkUserBalance(client *ethclient.Client, address common.Address, transfer
 		return ErrUserNativeBalanceInsufficient
 	}
 
-	// eth tx fee including gas for native tx, 1 VID
+	// fee including gas for native tx, 1 VID
 	feeAmount := big.NewInt(1000000000000000000)
 
+	feedTransferAmount := new(big.Int)
+	feedTransferAmount.Add(transferAmount, feeAmount)
+
 	// check user has enough balance to cover fee
-	if userNativeBalance.Cmp(feeAmount) <= 0 {
+	if userNativeBalance.Cmp(feedTransferAmount) < 0 {
 		return ErrUserNativeBalanceFeeInsufficient
 	}
 
@@ -96,9 +99,9 @@ func execNativeTransaction(client *ethclient.Client, key *keystore.Key, toAddres
 		return nil, fmt.Errorf("failed to get nonce: %s", err.Error())
 	}
 
-	fmt.Printf("creating tx of %d amount\n", amount.Uint64())
+	tx := types.NewTransaction(nonce, toAddress, amount, uint64(21000), big.NewInt(47619047619047), nil)
 
-	tx := types.NewTransaction(nonce, toAddress, amount, uint64(21000), big.NewInt(5000000000), nil)
+	fmt.Printf("creating tx of %s amount and cost is %s\n", amount, tx.Cost())
 
 	// chainID, err := client.ChainID(context.Background())
 	// if err != nil {
