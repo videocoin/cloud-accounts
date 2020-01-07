@@ -78,7 +78,7 @@ func checkBankBalance(client *ethclient.Client, address, tokenAddr common.Addres
 }
 
 func waitMinedAndCheck(client *ethclient.Client, tx *types.Transaction) error {
-	cancelCtx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
+	cancelCtx, cancel := context.WithTimeout(context.Background(), 240*time.Second)
 	defer cancel()
 
 	receipt, err := bind.WaitMined(cancelCtx, client, tx)
@@ -130,7 +130,7 @@ func execErc20Transaction(client *ethclient.Client, key *keystore.Key, toAddress
 
 	auth := bind.NewKeyedTransactor(key.PrivateKey)
 	auth.Value = big.NewInt(0)
-	auth.GasPrice = big.NewInt(5000000000)
+	auth.GasPrice = big.NewInt(10000000000)
 
 	// transfer erc tokens to user on ethereum net
 	tx, err := tokenInstance.Transfer(auth, toAddress, amount)

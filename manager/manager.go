@@ -57,7 +57,7 @@ func NewManager(opts *ManagerOpts) (*Manager, error) {
 		return nil, err
 	}
 
-	bTimeout := 60 * time.Second
+	bTimeout := 10 * time.Second
 
 	return &Manager{
 		eth:          opts.Eth,
@@ -100,6 +100,7 @@ func (m *Manager) startRefreshBalanceTask() error {
 			for _, account := range accounts {
 				_, err := m.refreshBalance(ctx, account)
 				if err != nil {
+					m.logger.Error(err)
 					continue
 				}
 			}
