@@ -10,7 +10,7 @@ import (
 	"github.com/videocoin/cloud-api/rpc"
 )
 
-func (s *RpcServer) Create(ctx context.Context, req *v1.AccountRequest) (*v1.AccountProfile, error) {
+func (s *Server) Create(ctx context.Context, req *v1.AccountRequest) (*v1.AccountProfile, error) {
 	span := opentracing.SpanFromContext(ctx)
 	span.SetTag("owner_id", req.OwnerId)
 
@@ -23,7 +23,7 @@ func (s *RpcServer) Create(ctx context.Context, req *v1.AccountRequest) (*v1.Acc
 	return profile, nil
 }
 
-func (s *RpcServer) List(ctx context.Context, req *protoempty.Empty) (*v1.ListResponse, error) {
+func (s *Server) List(ctx context.Context, req *protoempty.Empty) (*v1.ListResponse, error) {
 	_ = opentracing.SpanFromContext(ctx)
 
 	profiles, err := s.manager.ListAccounts(ctx)
@@ -37,7 +37,7 @@ func (s *RpcServer) List(ctx context.Context, req *protoempty.Empty) (*v1.ListRe
 	}, nil
 }
 
-func (s *RpcServer) Key(ctx context.Context, req *v1.AccountRequest) (*v1.AccountKey, error) {
+func (s *Server) Key(ctx context.Context, req *v1.AccountRequest) (*v1.AccountKey, error) {
 	span := opentracing.SpanFromContext(ctx)
 	span.SetTag("owner_id", req.OwnerId)
 
@@ -54,7 +54,7 @@ func (s *RpcServer) Key(ctx context.Context, req *v1.AccountRequest) (*v1.Accoun
 	return key, nil
 }
 
-func (s *RpcServer) Keys(ctx context.Context, req *protoempty.Empty) (*v1.AccountKeys, error) {
+func (s *Server) Keys(ctx context.Context, req *protoempty.Empty) (*v1.AccountKeys, error) {
 	_ = opentracing.SpanFromContext(ctx)
 
 	keys, err := s.manager.GetAccountKeys(ctx)
@@ -68,11 +68,11 @@ func (s *RpcServer) Keys(ctx context.Context, req *protoempty.Empty) (*v1.Accoun
 	}, nil
 }
 
-func (s *RpcServer) Get(ctx context.Context, req *v1.AccountRequest) (*v1.AccountProfile, error) {
+func (s *Server) Get(ctx context.Context, req *v1.AccountRequest) (*v1.AccountProfile, error) {
 	span := opentracing.SpanFromContext(ctx)
 	span.SetTag("id", req.Id)
 
-	profile, err := s.manager.GetAccountById(ctx, req.Id)
+	profile, err := s.manager.GetAccountByID(ctx, req.Id)
 	if err != nil {
 		logFailedTo(s.logger, "get account by id", err)
 		if err == datastore.ErrAccountNotFound {
@@ -85,7 +85,7 @@ func (s *RpcServer) Get(ctx context.Context, req *v1.AccountRequest) (*v1.Accoun
 	return profile, nil
 }
 
-func (s *RpcServer) GetByOwner(ctx context.Context, req *v1.AccountRequest) (*v1.AccountProfile, error) {
+func (s *Server) GetByOwner(ctx context.Context, req *v1.AccountRequest) (*v1.AccountProfile, error) {
 	span := opentracing.SpanFromContext(ctx)
 	span.SetTag("owner_id", req.OwnerId)
 
@@ -102,7 +102,7 @@ func (s *RpcServer) GetByOwner(ctx context.Context, req *v1.AccountRequest) (*v1
 	return profile, nil
 }
 
-func (s *RpcServer) GetByAddress(ctx context.Context, req *v1.Address) (*v1.AccountProfile, error) {
+func (s *Server) GetByAddress(ctx context.Context, req *v1.Address) (*v1.AccountProfile, error) {
 	span := opentracing.SpanFromContext(ctx)
 	span.SetTag("address", req.Address)
 
@@ -119,7 +119,7 @@ func (s *RpcServer) GetByAddress(ctx context.Context, req *v1.Address) (*v1.Acco
 	return profile, nil
 }
 
-func (s *RpcServer) CreateTransfer(ctx context.Context, req *v1.CreateTransferRequest) (*v1.TransferResponse, error) {
+func (s *Server) CreateTransfer(ctx context.Context, req *v1.CreateTransferRequest) (*v1.TransferResponse, error) {
 	span := opentracing.SpanFromContext(ctx)
 	span.SetTag("user_id", req.UserId)
 	span.SetTag("to_address", req.ToAddress)
@@ -133,7 +133,7 @@ func (s *RpcServer) CreateTransfer(ctx context.Context, req *v1.CreateTransferRe
 	return transfer, nil
 }
 
-func (s *RpcServer) GetTransfer(ctx context.Context, req *v1.TransferRequest) (*v1.TransferResponse, error) {
+func (s *Server) GetTransfer(ctx context.Context, req *v1.TransferRequest) (*v1.TransferResponse, error) {
 	span := opentracing.SpanFromContext(ctx)
 	span.SetTag("id", req.Id)
 
@@ -149,7 +149,7 @@ func (s *RpcServer) GetTransfer(ctx context.Context, req *v1.TransferRequest) (*
 	return transfer, nil
 }
 
-func (s *RpcServer) ExecuteTransfer(ctx context.Context, req *v1.ExecuteTransferRequest) (*protoempty.Empty, error) {
+func (s *Server) ExecuteTransfer(ctx context.Context, req *v1.ExecuteTransferRequest) (*protoempty.Empty, error) {
 	span := opentracing.SpanFromContext(ctx)
 	span.SetTag("id", req.Id)
 	span.SetTag("user_id", req.UserId)

@@ -48,8 +48,8 @@ func (m *Manager) ListAccounts(ctx context.Context) ([]*v1.AccountProfile, error
 	return profiles, nil
 }
 
-func (m *Manager) GetAccountById(ctx context.Context, id string) (*v1.AccountProfile, error) {
-	span, _ := opentracing.StartSpanFromContext(ctx, "manager.GetAccountById")
+func (m *Manager) GetAccountByID(ctx context.Context, id string) (*v1.AccountProfile, error) {
+	span, _ := opentracing.StartSpanFromContext(ctx, "manager.GetAccountByID")
 	defer span.Finish()
 
 	account, err := m.ds.Account.Get(ctx, id)

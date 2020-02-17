@@ -13,7 +13,7 @@ import (
 
 type Service struct {
 	cfg *Config
-	rpc *rpc.RpcServer
+	rpc *rpc.Server
 	eb  *ebus.EventBus
 	m   *manager.Manager
 }
@@ -47,7 +47,7 @@ func NewService(cfg *Config) (*Service, error) {
 	}
 
 	manager, err := manager.NewManager(
-		&manager.ManagerOpts{
+		&manager.Opts{
 			Ds:           ds,
 			EB:           eb,
 			Eth:          ec,
@@ -62,7 +62,7 @@ func NewService(cfg *Config) (*Service, error) {
 		return nil, err
 	}
 
-	rpcConfig := &rpc.RpcServerOptions{
+	rpcConfig := &rpc.ServerOptions{
 		Addr:         cfg.RPCAddr,
 		DS:           ds,
 		EB:           eb,
@@ -71,7 +71,7 @@ func NewService(cfg *Config) (*Service, error) {
 		Logger:       cfg.Logger,
 	}
 
-	rpc, err := rpc.NewRpcServer(rpcConfig)
+	rpc, err := rpc.NewServer(rpcConfig)
 	if err != nil {
 		return nil, err
 	}
@@ -87,16 +87,18 @@ func NewService(cfg *Config) (*Service, error) {
 }
 
 func (s *Service) Start() error {
-	go s.rpc.Start()
-	go s.eb.Start()
-	go s.m.StartBackgroundTasks()
+	go s.rpc.Start() //nolint
+	go s.eb.Start() //nolint
+	go s.m.StartBackgroundTasks() //nolint
 
 	return nil
 }
 
 func (s *Service) Stop() error {
-	s.eb.Stop()
-	s.m.StopBackgroundTasks()
-
-	return nil
+	err := s.eb.Stop()
+	if err != nil {
+		return err
+	}
+	err = s.m.StopBackgroundTasks()
+	return err
 }

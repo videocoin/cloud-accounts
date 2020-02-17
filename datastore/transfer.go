@@ -26,7 +26,7 @@ func NewTransferDatastore(db *gorm.DB) (*TransferDatastore, error) {
 	return &TransferDatastore{db: db}, nil
 }
 
-func (ds *TransferDatastore) Create(ctx context.Context, userId, address string, amount []byte) (*v1.Transfer, error) {
+func (ds *TransferDatastore) Create(ctx context.Context, userID, address string, amount []byte) (*v1.Transfer, error) {
 	span, _ := opentracing.StartSpanFromContext(ctx, "Create")
 	defer span.Finish()
 
@@ -58,7 +58,7 @@ func (ds *TransferDatastore) Create(ctx context.Context, userId, address string,
 
 	transfer := &v1.Transfer{
 		Id:        id,
-		UserId:    userId,
+		UserId:    userID,
 		Kind:      v1.TransferKindWithdraw,
 		Pin:       encodeToString(6),
 		ToAddress: address,
@@ -95,14 +95,14 @@ func (ds *TransferDatastore) Get(ctx context.Context, id string) (*v1.Transfer, 
 	return transfer, nil
 }
 
-func (ds *TransferDatastore) ListByUser(ctx context.Context, userId string) ([]*v1.Transfer, error) {
+func (ds *TransferDatastore) ListByUser(ctx context.Context, userID string) ([]*v1.Transfer, error) {
 	span, _ := opentracing.StartSpanFromContext(ctx, "ListByUser")
 	defer span.Finish()
 
-	span.SetTag("user_id", userId)
+	span.SetTag("user_id", userID)
 
 	transfers := []*v1.Transfer{}
-	if err := ds.db.Where("user_id = ?", userId).Find(&transfers).Error; err != nil {
+	if err := ds.db.Where("user_id = ?", userID).Find(&transfers).Error; err != nil {
 		return nil, fmt.Errorf("failed to get user transfers: %s", err)
 	}
 

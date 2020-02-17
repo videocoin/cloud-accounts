@@ -10,12 +10,12 @@ import (
 	v1 "github.com/videocoin/cloud-api/accounts/v1"
 	"github.com/videocoin/cloud-pkg/grpcutil"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/reflection"
 	"google.golang.org/grpc/health"
 	"google.golang.org/grpc/health/grpc_health_v1"
+	"google.golang.org/grpc/reflection"
 )
 
-type RpcServerOptions struct {
+type ServerOptions struct {
 	Addr    string
 	DS      *datastore.Datastore
 	EB      *ebus.EventBus
@@ -26,7 +26,7 @@ type RpcServerOptions struct {
 	Logger *logrus.Entry
 }
 
-type RpcServer struct {
+type Server struct {
 	addr   string
 	grpc   *grpc.Server
 	listen net.Listener
@@ -40,7 +40,7 @@ type RpcServer struct {
 	logger *logrus.Entry
 }
 
-func NewRpcServer(opts *RpcServerOptions) (*RpcServer, error) {
+func NewServer(opts *ServerOptions) (*Server, error) {
 	grpcOpts := grpcutil.DefaultServerOpts(opts.Logger)
 	grpcServer := grpc.NewServer(grpcOpts...)
 	healthService := health.NewServer()
@@ -50,7 +50,7 @@ func NewRpcServer(opts *RpcServerOptions) (*RpcServer, error) {
 		return nil, err
 	}
 
-	rpcServer := &RpcServer{
+	rpcServer := &Server{
 		addr:         opts.Addr,
 		grpc:         grpcServer,
 		listen:       listen,
@@ -67,7 +67,7 @@ func NewRpcServer(opts *RpcServerOptions) (*RpcServer, error) {
 	return rpcServer, nil
 }
 
-func (s *RpcServer) Start() error {
+func (s *Server) Start() error {
 	s.logger.Infof("starting rpc server on %s", s.addr)
 	return s.grpc.Serve(s.listen)
 }

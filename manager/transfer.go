@@ -86,7 +86,7 @@ func (m *Manager) executeTransfer(ctx context.Context, key *v1.AccountKey, req *
 
 	defer func() {
 		if err := m.ds.Account.Unlock(ctx, &ds.Account{
-			Id: req.Id,
+			ID: req.Id,
 		}); err != nil {
 			m.logger.WithError(err).Error("failed to unlock account")
 		}
@@ -110,7 +110,7 @@ func (m *Manager) executeTransfer(ctx context.Context, key *v1.AccountKey, req *
 	}()
 
 	if err := m.ds.Account.Lock(ctx, &ds.Account{
-		Id: req.Id,
+		ID: req.Id,
 	}); err != nil {
 		failReason = "Failed to lock account"
 		m.logger.WithError(err).Error("failed to lock account")

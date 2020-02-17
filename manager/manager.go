@@ -13,7 +13,7 @@ import (
 	n "github.com/videocoin/cloud-accounts/notifications"
 )
 
-type ManagerOpts struct {
+type Opts struct {
 	Eth *ec.Client
 	Vdc *ec.Client
 
@@ -45,7 +45,7 @@ type Manager struct {
 	rbLock   sync.Mutex
 }
 
-func NewManager(opts *ManagerOpts) (*Manager, error) {
+func NewManager(opts *Opts) (*Manager, error) {
 	key, err := keystore.DecryptKey([]byte(opts.BankKey), opts.BankSecret)
 	if err != nil {
 		return nil, err
@@ -83,31 +83,27 @@ func (m *Manager) StopBackgroundTasks() error {
 	return nil
 }
 
-func (m *Manager) startRefreshBalanceTask() error {
-	for {
-		select {
-		case <-m.bTicker.C:
-			m.rbLock.Lock()
+func (m *Manager) startRefreshBalanceTask() {
+	for range m.bTicker.C {
+		m.rbLock.Lock()
 
-			ctx := context.Background()
-			accounts, err := m.ds.Account.List(ctx)
+		ctx := context.Background()
+		accounts, err := m.ds.Account.List(ctx)
+		if err != nil {
+			m.logger.Error(err)
+			time.Sleep(time.Second * 5)
+			continue
+		}
+
+		for _, account := range accounts {
+			_, err := m.refreshBalance(ctx, account)
 			if err != nil {
 				m.logger.Error(err)
-				time.Sleep(time.Second * 5)
 				continue
 			}
-
-			for _, account := range accounts {
-				_, err := m.refreshBalance(ctx, account)
-				if err != nil {
-					m.logger.Error(err)
-					continue
-				}
-			}
-
-			m.rbLock.Unlock()
 		}
+
+		m.rbLock.Unlock()
 	}
 
-	return nil
 }

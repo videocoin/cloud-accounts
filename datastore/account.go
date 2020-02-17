@@ -26,8 +26,8 @@ func NewAccountDatastore(db *gorm.DB) (*AccountDatastore, error) {
 }
 
 type Account struct {
-	Id         string     `gorm:"type:varchar(36);PRIMARY_KEY"`
-	UserId     string     `gorm:"type:varchar(255);DEFAULT:null"`
+	ID         string     `gorm:"type:varchar(36);PRIMARY_KEY"`
+	UserID     string     `gorm:"type:varchar(255);DEFAULT:null"`
 	Address    string     `gorm:"type:varchar(42);DEFAULT:null"`
 	Key        string     `gorm:"type:varchar(42);DEFAULT:null"`
 	UpdatedAt  *time.Time `gorm:"type:timestamp NULL;DEFAULT:null"`
@@ -56,8 +56,8 @@ func (ds *AccountDatastore) Create(ctx context.Context, userID string, passphras
 	}
 
 	account := &Account{
-		Id:      id,
-		UserId:  userID,
+		ID:      id,
+		UserID:  userID,
 		Address: key.Address,
 		Key:     key.KeyFile,
 	}

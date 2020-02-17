@@ -106,11 +106,14 @@ func (e *EventBus) SendNotification(span opentracing.Span, req *notificationv1.N
 	ext.SpanKindRPCServer.Set(span)
 	ext.Component.Set(span, "accounts")
 
-	span.Tracer().Inject(
+	err := span.Tracer().Inject(
 		span.Context(),
 		opentracing.TextMap,
 		mqmux.RMQHeaderCarrier(headers),
 	)
+	if err != nil {
+		return err
+	}
 
 	return e.mq.PublishX("notifications.send", req, headers)
 }
