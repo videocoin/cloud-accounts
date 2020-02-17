@@ -28,6 +28,12 @@ deps:
 	cp -r $(GOPATH)/src/github.com/ethereum/go-ethereum/crypto/secp256k1/libsecp256k1 \
 	vendor/github.com/ethereum/go-ethereum/crypto/secp256k1/
 
+lint:
+	golangci-lint run -v
+
+docker-lint:
+	docker build -f Dockerfile.lint .
+
 docker-build:
 	docker build -t gcr.io/${GCP_PROJECT}/${NAME}:${VERSION} -f Dockerfile .
 
