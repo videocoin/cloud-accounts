@@ -31,18 +31,24 @@ func NewEventBus(mq *mqmux.WorkerMux, ds *datastore.Datastore, clientSecret stri
 	}, nil
 }
 
-func (e *EventBus) Start() error {
+func (e *EventBus) Start() {
 	err := e.registerPublishers()
 	if err != nil {
-		return err
+		e.logger.WithError(err).Error("failed to start eventbus on registering publishers")
+		return
 	}
 
 	err = e.registerConsumers()
 	if err != nil {
-		return err
+		e.logger.WithError(err).Error("failed to start eventbus on registering consumers")
+		return
 	}
 
-	return e.mq.Run()
+	err = e.mq.Run()
+	if err != nil {
+		e.logger.WithError(err).Error("failed to start eventbus on worker mux start")
+		return
+	}
 }
 
 func (e *EventBus) Stop() error {
