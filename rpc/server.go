@@ -67,7 +67,11 @@ func NewServer(opts *ServerOptions) (*Server, error) {
 	return rpcServer, nil
 }
 
-func (s *Server) Start() error {
+func (s *Server) Start() {
 	s.logger.Infof("starting rpc server on %s", s.addr)
-	return s.grpc.Serve(s.listen)
+
+	err := s.grpc.Serve(s.listen)
+	if err != nil {
+		s.logger.WithError(err).Errorf("Failed to start rpc server on %s", s.addr)
+	}
 }

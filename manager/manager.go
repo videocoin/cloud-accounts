@@ -73,9 +73,8 @@ func NewManager(opts *Opts) (*Manager, error) {
 	}, nil
 }
 
-func (m *Manager) StartBackgroundTasks() error {
+func (m *Manager) StartBackgroundTasks() {
 	go m.startRefreshBalanceTask()
-	return nil
 }
 
 func (m *Manager) StopBackgroundTasks() error {
