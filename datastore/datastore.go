@@ -6,8 +6,7 @@ import (
 )
 
 type Datastore struct {
-	Account  *AccountDatastore
-	Transfer *TransferDatastore
+	Account *AccountDatastore
 }
 
 func NewDatastore(uri string) (*Datastore, error) {
@@ -18,7 +17,7 @@ func NewDatastore(uri string) (*Datastore, error) {
 		return nil, err
 	}
 
-	//db.LogMode(true)
+	db.LogMode(true)
 
 	accountsDs, err := NewAccountDatastore(db)
 	if err != nil {
@@ -26,13 +25,6 @@ func NewDatastore(uri string) (*Datastore, error) {
 	}
 
 	ds.Account = accountsDs
-
-	transfersDs, err := NewTransferDatastore(db)
-	if err != nil {
-		return nil, err
-	}
-
-	ds.Transfer = transfersDs
 
 	return ds, nil
 }

@@ -41,20 +41,11 @@ func NewService(cfg *Config) (*Service, error) {
 		return nil, fmt.Errorf("failed to dial native client: %s", err.Error())
 	}
 
-	ec, err := ec.Dial(cfg.RPCEthHTTPAddr)
-	if err != nil {
-		return nil, fmt.Errorf("failed to dial eth client: %s", err.Error())
-	}
-
 	manager, err := manager.NewManager(
 		&manager.Opts{
 			Ds:           ds,
 			EB:           eb,
-			Eth:          ec,
 			Vdc:          vc,
-			TokenAddr:    cfg.TokenAddr,
-			BankKey:      cfg.BankKey,
-			BankSecret:   cfg.BankSecret,
 			ClientSecret: cfg.ClientSecret,
 			Logger:       cfg.Logger.WithField("system", "manager"),
 		})

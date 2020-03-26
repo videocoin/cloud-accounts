@@ -29,11 +29,8 @@ resources:
 
 secrets:
   nodeHttpAddr: ""
-  nodeEthAddr: ""
   dbUri: ""
   mqUri: ""
-  bankKey: ""
-  bankSecret: ""
   clientSecret: ""
   sentryDsn: ""
 
