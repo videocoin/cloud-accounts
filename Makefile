@@ -29,7 +29,7 @@ deps:
 	vendor/github.com/ethereum/go-ethereum/crypto/secp256k1/
 
 lint:
-	golangci-lint run -v
+	golangci-lint run -v --timeout 120s
 
 docker-lint:
 	docker build -f Dockerfile.lint .
