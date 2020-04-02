@@ -28,8 +28,7 @@ deps:
 	cp -r $(GOPATH)/src/github.com/ethereum/go-ethereum/crypto/secp256k1/libsecp256k1 \
 	vendor/github.com/ethereum/go-ethereum/crypto/secp256k1/
 
-lint:
-	golangci-lint run -v --timeout 120s
+lint: docker-lint
 
 docker-lint:
 	docker build -f Dockerfile.lint .
