@@ -8,6 +8,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/videocoin/cloud-accounts/datastore"
 	"github.com/videocoin/cloud-accounts/ebus"
+	faucetcli "github.com/videocoin/go-faucet/client"
 )
 
 type Opts struct {
@@ -16,6 +17,7 @@ type Opts struct {
 	EB           *ebus.EventBus
 	Logger       *logrus.Entry
 	ClientSecret string
+	Faucet       *faucetcli.Client
 }
 
 type Manager struct {
@@ -25,6 +27,7 @@ type Manager struct {
 	clientSecret string
 	bTicker      *time.Ticker
 	bTimeout     time.Duration
+	faucet       *faucetcli.Client
 }
 
 func NewManager(opts *Opts) (*Manager, error) {
@@ -37,6 +40,7 @@ func NewManager(opts *Opts) (*Manager, error) {
 		logger:       opts.Logger,
 		bTimeout:     bTimeout,
 		bTicker:      time.NewTicker(bTimeout),
+		faucet:       opts.Faucet,
 	}, nil
 }
 

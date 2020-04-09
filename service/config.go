@@ -12,6 +12,7 @@ type Config struct {
 	RPCNodeHTTPAddr string `default:"" envconfig:"RPC_NODE_HTTP_ADDR"`
 	DBURI           string `default:"root:@tcp(127.0.0.1:3306)/videocoin?charset=utf8&parseTime=True&loc=Local" envconfig:"DBURI"`
 	MQURI           string `default:"amqp://guest:guest@127.0.0.1:5672" envconfig:"MQURI"`
+	FaucetURL       string `envconfig:"FAUCET_URL" required:"true" default:"http://dev1:D6msEL93LJT5RaPk@faucet.dev.kili.videocoin.network"`
 
 	ClientSecret string `default:"secret" envconfig:"CLIENT_SECRET"`
 

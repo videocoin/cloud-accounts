@@ -9,6 +9,7 @@ import (
 	"github.com/videocoin/cloud-accounts/manager"
 	"github.com/videocoin/cloud-accounts/rpc"
 	"github.com/videocoin/cloud-pkg/mqmux"
+	faucetcli "github.com/videocoin/go-faucet/client"
 )
 
 type Service struct {
@@ -41,6 +42,8 @@ func NewService(cfg *Config) (*Service, error) {
 		return nil, fmt.Errorf("failed to dial native client: %s", err.Error())
 	}
 
+	faucet := faucetcli.NewClient(cfg.FaucetURL)
+
 	manager, err := manager.NewManager(
 		&manager.Opts{
 			Ds:           ds,
@@ -48,6 +51,7 @@ func NewService(cfg *Config) (*Service, error) {
 			Vdc:          vc,
 			ClientSecret: cfg.ClientSecret,
 			Logger:       cfg.Logger.WithField("system", "manager"),
+			Faucet:       faucet,
 		})
 	if err != nil {
 		return nil, err

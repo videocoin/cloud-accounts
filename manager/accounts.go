@@ -2,12 +2,14 @@ package manager
 
 import (
 	"context"
+	"math/big"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/jinzhu/copier"
 	"github.com/opentracing/opentracing-go"
 	ds "github.com/videocoin/cloud-accounts/datastore"
 	v1 "github.com/videocoin/cloud-api/accounts/v1"
+	"github.com/videocoin/cloud-pkg/ethutils"
 	"github.com/videocoin/cloud-pkg/tracer"
 )
 
@@ -146,9 +148,21 @@ func (m *Manager) refreshBalance(ctx context.Context, account *ds.Account) (stri
 		return "0", err
 	}
 
-	if err = m.ds.Account.SetBalance(ctx, account, balance); err != nil {
-		tracer.SpanLogError(span, err)
-		return "0", err
+	if balance.String() != account.BalanceWei {
+		if err = m.ds.Account.SetBalance(ctx, account, balance); err != nil {
+			tracer.SpanLogError(span, err)
+			return "0", err
+		}
+	}
+
+	balanceEth, err := ethutils.WeiToEth(balance)
+	if err == nil {
+		if balanceEth.Cmp(big.NewFloat(10)) <= 0 {
+			err = m.faucet.Do(account.Address, 1)
+			if err != nil {
+				m.logger.WithField("address", address).Errorf("failed to faucet: %s", err)
+			}
+		}
 	}
 
 	return balance.String(), nil
