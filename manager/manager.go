@@ -8,7 +8,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/videocoin/cloud-accounts/datastore"
 	"github.com/videocoin/cloud-accounts/ebus"
-	faucetcli "github.com/videocoin/go-faucet/client"
+	faucetcli "github.com/videocoin/cloud-pkg/faucet"
 )
 
 type Opts struct {

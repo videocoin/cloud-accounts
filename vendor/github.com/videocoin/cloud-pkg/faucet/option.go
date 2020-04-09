@@ -1,4 +1,4 @@
-package client
+package faucet
 
 type Option func(*Client)
 

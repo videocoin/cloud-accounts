@@ -8,8 +8,8 @@ import (
 	"github.com/videocoin/cloud-accounts/ebus"
 	"github.com/videocoin/cloud-accounts/manager"
 	"github.com/videocoin/cloud-accounts/rpc"
+	faucetcli "github.com/videocoin/cloud-pkg/faucet"
 	"github.com/videocoin/cloud-pkg/mqmux"
-	faucetcli "github.com/videocoin/go-faucet/client"
 )
 
 type Service struct {

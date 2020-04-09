@@ -163,13 +163,12 @@ github.com/videocoin/cloud-api/notifications/v1
 github.com/videocoin/cloud-api/rpc
 # github.com/videocoin/cloud-pkg v0.0.6 => ../cloud-pkg
 github.com/videocoin/cloud-pkg/ethutils
+github.com/videocoin/cloud-pkg/faucet
 github.com/videocoin/cloud-pkg/grpcutil
 github.com/videocoin/cloud-pkg/logger
 github.com/videocoin/cloud-pkg/mqmux
 github.com/videocoin/cloud-pkg/tracer
 github.com/videocoin/cloud-pkg/uuid4
-# github.com/videocoin/go-faucet v0.0.0-00010101000000-000000000000 => ../go-faucet
-github.com/videocoin/go-faucet/client
 # go.uber.org/atomic v1.5.1
 go.uber.org/atomic
 # golang.org/x/crypto v0.0.0-20191205180655-e7c4368fe9dd
