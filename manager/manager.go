@@ -2,7 +2,6 @@ package manager
 
 import (
 	"context"
-	"sync"
 	"time"
 
 	ec "github.com/ethereum/go-ethereum/ethclient"
@@ -26,7 +25,6 @@ type Manager struct {
 	clientSecret string
 	bTicker      *time.Ticker
 	bTimeout     time.Duration
-	rbLock       sync.Mutex
 }
 
 func NewManager(opts *Opts) (*Manager, error) {
@@ -53,24 +51,19 @@ func (m *Manager) StopBackgroundTasks() error {
 
 func (m *Manager) startRefreshBalanceTask() {
 	for range m.bTicker.C {
-		m.rbLock.Lock()
-
 		ctx := context.Background()
 		accounts, err := m.ds.Account.List(ctx)
 		if err != nil {
-			m.logger.Error(err)
-			time.Sleep(time.Second * 5)
+			m.logger.Errorf("failed to get accounts list: %s", err)
 			continue
 		}
 
 		for _, account := range accounts {
 			_, err := m.refreshBalance(ctx, account)
 			if err != nil {
-				m.logger.Error(err)
+				m.logger.Errorf("failed to refresh balance: %s", err)
 				continue
 			}
 		}
-
-		m.rbLock.Unlock()
 	}
 }
