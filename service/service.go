@@ -1,14 +1,10 @@
 package service
 
 import (
-	"fmt"
-
-	ec "github.com/ethereum/go-ethereum/ethclient"
 	"github.com/videocoin/cloud-accounts/datastore"
 	"github.com/videocoin/cloud-accounts/ebus"
 	"github.com/videocoin/cloud-accounts/manager"
 	"github.com/videocoin/cloud-accounts/rpc"
-	faucetcli "github.com/videocoin/cloud-pkg/faucet"
 	"github.com/videocoin/cloud-pkg/mqmux"
 )
 
@@ -16,7 +12,6 @@ type Service struct {
 	cfg *Config
 	rpc *rpc.Server
 	eb  *ebus.EventBus
-	m   *manager.Manager
 }
 
 func NewService(cfg *Config) (*Service, error) {
@@ -37,33 +32,21 @@ func NewService(cfg *Config) (*Service, error) {
 		return nil, err
 	}
 
-	vc, err := ec.Dial(cfg.RPCNodeHTTPAddr)
-	if err != nil {
-		return nil, fmt.Errorf("failed to dial native client: %s", err.Error())
-	}
-
-	faucet := faucetcli.NewClient(cfg.FaucetURL)
-
 	manager, err := manager.NewManager(
 		&manager.Opts{
-			Ds:           ds,
-			EB:           eb,
-			Vdc:          vc,
-			ClientSecret: cfg.ClientSecret,
 			Logger:       cfg.Logger.WithField("system", "manager"),
-			Faucet:       faucet,
+			ClientSecret: cfg.ClientSecret,
+			DS:           ds,
 		})
 	if err != nil {
 		return nil, err
 	}
 
 	rpcConfig := &rpc.ServerOptions{
-		Addr:         cfg.RPCAddr,
-		DS:           ds,
-		EB:           eb,
-		Manager:      manager,
-		ClientSecret: cfg.ClientSecret,
-		Logger:       cfg.Logger,
+		Logger:  cfg.Logger,
+		Addr:    cfg.RPCAddr,
+		DS:      ds,
+		Manager: manager,
 	}
 
 	rpc, err := rpc.NewServer(rpcConfig)
@@ -75,7 +58,6 @@ func NewService(cfg *Config) (*Service, error) {
 		cfg: cfg,
 		rpc: rpc,
 		eb:  eb,
-		m:   manager,
 	}
 
 	return svc, nil
@@ -89,15 +71,8 @@ func (s *Service) Start(errCh chan error) {
 	go func() {
 		errCh <- s.eb.Start()
 	}()
-
-	s.m.StartBackgroundTasks()
 }
 
 func (s *Service) Stop() error {
-	err := s.eb.Stop()
-	if err != nil {
-		return err
-	}
-	err = s.m.StopBackgroundTasks()
-	return err
+	return s.eb.Stop()
 }

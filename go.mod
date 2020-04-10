@@ -1,9 +1,8 @@
 module github.com/videocoin/cloud-accounts
 
-go 1.12
+go 1.14
 
 require (
-	cloud.google.com/go v0.37.4 // indirect
 	github.com/ethereum/go-ethereum v1.8.27
 	github.com/golang/protobuf v1.3.1
 	github.com/jinzhu/copier v0.0.0-20180308034124-7e38e58719c3
@@ -15,10 +14,8 @@ require (
 	github.com/videocoin/cloud-api v0.2.15
 	github.com/videocoin/cloud-pkg v0.0.6
 	google.golang.org/grpc v1.21.1
-	gopkg.in/yaml.v2 v2.2.2 // indirect
 )
 
 replace github.com/videocoin/cloud-api => ../cloud-api
 
 replace github.com/videocoin/cloud-pkg => ../cloud-pkg
-

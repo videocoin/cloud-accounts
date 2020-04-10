@@ -20,8 +20,7 @@ var (
 func main() {
 	logger.Init(ServiceName, Version)
 
-	log := logrus.NewEntry(logrus.New())
-	log = logrus.WithFields(logrus.Fields{
+	log := logrus.NewEntry(logrus.New()).WithFields(logrus.Fields{
 		"service": ServiceName,
 		"version": Version,
 	})

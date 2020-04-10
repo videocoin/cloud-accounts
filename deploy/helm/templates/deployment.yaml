@@ -40,11 +40,6 @@ spec:
               value: "6831"
             - name: RPC_ADDR
               value: 0.0.0.0:{{ .Values.service.internalRpcPort }}
-            - name: RPC_NODE_HTTP_ADDR
-              valueFrom:
-                secretKeyRef:
-                  name: {{ .Chart.Name }}
-                  key: rpcNodeHttpAddr
             - name: DBURI
               valueFrom:
                 secretKeyRef:

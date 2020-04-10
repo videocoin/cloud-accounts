@@ -1,4 +1,4 @@
-replicasCount: 1
+replicasCount: 3
 maxUnavailableCount: 0
 
 image:
@@ -28,7 +28,6 @@ resources:
    memory: 1000Mi
 
 secrets:
-  nodeHttpAddr: ""
   dbUri: ""
   mqUri: ""
   clientSecret: ""

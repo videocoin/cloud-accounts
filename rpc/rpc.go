@@ -28,10 +28,11 @@ func (s *Server) Key(ctx context.Context, req *v1.AccountRequest) (*v1.AccountKe
 
 	key, err := s.manager.GetAccountKey(ctx, req.OwnerId)
 	if err != nil {
-		logFailedTo(s.logger, "get account key", err)
 		if err == datastore.ErrAccountNotFound {
 			return nil, rpc.ErrRpcNotFound
 		}
+
+		logFailedTo(s.logger, "get account key", err)
 
 		return nil, rpc.ErrRpcInternal
 	}
@@ -45,10 +46,11 @@ func (s *Server) Get(ctx context.Context, req *v1.AccountRequest) (*v1.AccountPr
 
 	profile, err := s.manager.GetAccountByID(ctx, req.Id)
 	if err != nil {
-		logFailedTo(s.logger, "get account by id", err)
 		if err == datastore.ErrAccountNotFound {
 			return nil, rpc.ErrRpcNotFound
 		}
+
+		logFailedTo(s.logger, "get account by id", err)
 
 		return nil, rpc.ErrRpcInternal
 	}
@@ -62,10 +64,11 @@ func (s *Server) GetByOwner(ctx context.Context, req *v1.AccountRequest) (*v1.Ac
 
 	profile, err := s.manager.GetAccountByOwner(ctx, req.OwnerId)
 	if err != nil {
-		logFailedTo(s.logger, "get account by owner", err)
 		if err == datastore.ErrAccountNotFound {
 			return nil, rpc.ErrRpcNotFound
 		}
+
+		logFailedTo(s.logger, "get account by owner", err)
 
 		return nil, rpc.ErrRpcInternal
 	}
