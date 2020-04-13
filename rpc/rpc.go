@@ -3,6 +3,7 @@ package rpc
 import (
 	"context"
 
+	protoempty "github.com/gogo/protobuf/types"
 	"github.com/opentracing/opentracing-go"
 	"github.com/videocoin/cloud-accounts/datastore"
 	v1 "github.com/videocoin/cloud-api/accounts/v1"
@@ -56,6 +57,16 @@ func (s *Server) Get(ctx context.Context, req *v1.AccountRequest) (*v1.AccountPr
 	}
 
 	return profile, nil
+}
+
+func (s *Server) List(ctx context.Context, req *protoempty.Empty) (*v1.Accounts, error) {
+	accounts, err := s.manager.GetAccounts(ctx)
+	if err != nil {
+		logFailedTo(s.logger, "get accounts", err)
+		return nil, rpc.ErrRpcInternal
+	}
+
+	return accounts, nil
 }
 
 func (s *Server) GetByOwner(ctx context.Context, req *v1.AccountRequest) (*v1.AccountProfile, error) {

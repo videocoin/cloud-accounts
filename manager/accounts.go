@@ -25,8 +25,8 @@ func (m *Manager) CreateAccount(ctx context.Context, req *v1.AccountRequest) (*v
 	}, nil
 }
 
-func (m *Manager) ListAccounts(ctx context.Context) ([]*v1.AccountProfile, error) {
-	span, _ := opentracing.StartSpanFromContext(ctx, "manager.ListAccounts")
+func (m *Manager) GetAccounts(ctx context.Context) (*v1.Accounts, error) {
+	span, _ := opentracing.StartSpanFromContext(ctx, "manager.GetAccounts")
 	defer span.Finish()
 
 	accounts, err := m.ds.Account.List(ctx)
@@ -35,12 +35,12 @@ func (m *Manager) ListAccounts(ctx context.Context) ([]*v1.AccountProfile, error
 		return nil, err
 	}
 
-	profiles := make([]*v1.AccountProfile, len(accounts))
-	for i, account := range accounts {
-		profiles[i] = &v1.AccountProfile{
+	profiles := &v1.Accounts{Items: []*v1.AccountProfile{}}
+	for _, account := range accounts {
+		profiles.Items = append(profiles.Items, &v1.AccountProfile{
 			Address: account.Address,
-			Balance: account.BalanceWei,
-		}
+			Balance: "0",
+		})
 	}
 
 	return profiles, nil
