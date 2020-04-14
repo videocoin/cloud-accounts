@@ -54,6 +54,10 @@ func (e *EventBus) registerPublishers() error {
 		return err
 	}
 
+	if err := e.mq.Publisher("accounts.events"); err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -92,9 +96,16 @@ func (e *EventBus) handleCreateAccount(d amqp.Delivery) error {
 		return nil
 	}
 
-	_, err = e.ds.Account.Create(opentracing.ContextWithSpan(context.Background(), span), req.OwnerId, e.clientSecret)
+	ctx := opentracing.ContextWithSpan(context.Background(), span)
+	account, err := e.ds.Account.Create(ctx, req.OwnerId, e.clientSecret)
 	if err != nil {
 		e.logger.Errorf("failed to create account: %s", err)
+		return nil
+	}
+
+	err = e.EmitAccountCreated(ctx, account)
+	if err != nil {
+		e.logger.Errorf("failed to emit account created: %s", err)
 		return nil
 	}
 
@@ -116,4 +127,34 @@ func (e *EventBus) SendNotification(span opentracing.Span, req *notificationv1.N
 	}
 
 	return e.mq.PublishX("notifications.send", req, headers)
+}
+
+func (e *EventBus) EmitAccountCreated(ctx context.Context, account *datastore.Account) error {
+	headers := make(amqp.Table)
+
+	span := opentracing.SpanFromContext(ctx)
+	if span != nil {
+		ext.SpanKindRPCServer.Set(span)
+		ext.Component.Set(span, "transcoder")
+		err := span.Tracer().Inject(
+			span.Context(),
+			opentracing.TextMap,
+			mqmux.RMQHeaderCarrier(headers),
+		)
+		if err != nil {
+			e.logger.Errorf("failed to span inject: %s", err)
+		}
+	}
+	event := &v1.Event{
+		Type:    v1.EventTypeAccountCreated,
+		UserID:  account.UserID,
+		Address: account.Address,
+	}
+
+	err := e.mq.PublishX("accounts.events", event, headers)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
