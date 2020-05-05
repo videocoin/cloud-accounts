@@ -4,10 +4,8 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"math/big"
 	"time"
 
-	"github.com/golang/protobuf/ptypes"
 	"github.com/jinzhu/gorm"
 	"github.com/opentracing/opentracing-go"
 	"github.com/videocoin/cloud-pkg/uuid4"
@@ -26,13 +24,11 @@ func NewAccountDatastore(db *gorm.DB) (*AccountDatastore, error) {
 }
 
 type Account struct {
-	ID         string     `gorm:"type:varchar(36);PRIMARY_KEY"`
-	UserID     string     `gorm:"type:varchar(255);DEFAULT:null"`
-	Address    string     `gorm:"type:varchar(42);DEFAULT:null"`
-	Key        string     `gorm:"type:varchar(42);DEFAULT:null"`
-	UpdatedAt  *time.Time `gorm:"type:timestamp NULL;DEFAULT:null"`
-	Balance    string     `gorm:"type:double;DEFAULT:null"`
-	BalanceWei string     `gorm:"type:varchar(255);DEFAULT:null"`
+	ID        string     `gorm:"type:varchar(36);PRIMARY_KEY"`
+	UserID    string     `gorm:"type:varchar(255);DEFAULT:null"`
+	Address   string     `gorm:"type:varchar(42);DEFAULT:null"`
+	Key       string     `gorm:"type:varchar(42);DEFAULT:null"`
+	UpdatedAt *time.Time `gorm:"type:timestamp NULL;DEFAULT:null"`
 }
 
 func (ds *AccountDatastore) Create(ctx context.Context, userID string, passphrase string) (*Account, error) {
@@ -151,18 +147,6 @@ func (ds *AccountDatastore) Update(ctx context.Context, account *Account, update
 	}
 
 	return nil
-}
-
-func (ds *AccountDatastore) SetBalance(ctx context.Context, account *Account, balance *big.Int) error {
-	time, err := ptypes.Timestamp(ptypes.TimestampNow())
-	if err != nil {
-		return err
-	}
-
-	return ds.Update(ctx, account, map[string]interface{}{
-		"balance_wei": balance.String(),
-		"updated_at":  &time,
-	})
 }
 
 func (ds *AccountDatastore) Lock(ctx context.Context, account *Account) error {
