@@ -21,7 +21,6 @@ func (m *Manager) CreateAccount(ctx context.Context, req *v1.AccountRequest) (*v
 
 	return &v1.AccountProfile{
 		Address: account.Address,
-		Balance: "0",
 	}, nil
 }
 
@@ -39,7 +38,6 @@ func (m *Manager) GetAccounts(ctx context.Context) (*v1.Accounts, error) {
 	for _, account := range accounts {
 		profiles.Items = append(profiles.Items, &v1.AccountProfile{
 			Address: account.Address,
-			Balance: "0",
 		})
 	}
 
@@ -58,7 +56,6 @@ func (m *Manager) GetAccountByID(ctx context.Context, id string) (*v1.AccountPro
 
 	return &v1.AccountProfile{
 		Address: account.Address,
-		Balance: account.BalanceWei,
 	}, nil
 }
 
@@ -74,7 +71,6 @@ func (m *Manager) GetAccountByOwner(ctx context.Context, ownerID string) (*v1.Ac
 
 	return &v1.AccountProfile{
 		Address: account.Address,
-		Balance: account.BalanceWei,
 	}, nil
 }
 
@@ -90,7 +86,6 @@ func (m *Manager) GetAccountByAddress(ctx context.Context, address string) (*v1.
 
 	return &v1.AccountProfile{
 		Address: account.Address,
-		Balance: account.BalanceWei,
 	}, nil
 }
 
