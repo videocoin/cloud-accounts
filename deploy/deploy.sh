@@ -62,6 +62,7 @@ function deploy() {
     helm upgrade \
         --kube-context "${KUBE_CONTEXT}" \
         --install \
+        --force \
         --set image.repository="gcr.io/${GCP_PROJECT}/${CHART_NAME}" \
         --set image.tag="${VERSION}" \
         --set secrets.dbUri="${DB_URI}" \
