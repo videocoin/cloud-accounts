@@ -1,5 +1,5 @@
 replicasCount: 3
-maxUnavailableCount: 0
+maxUnavailableCount: 1
 
 image:
   repository: gcr.io/videocoin-network/accounts

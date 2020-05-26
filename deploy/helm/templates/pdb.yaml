@@ -1,0 +1,13 @@
+{{- if .Values.maxUnavailableCount -}}
+{{- if gt .Values.replicasCount 1.0 -}}
+apiVersion: policy/v1beta1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ .Release.Name }}
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}
+{{- end -}}
+{{- end -}}
