@@ -33,6 +33,6 @@ resources:
 
 secrets:
   dbUri: "cm9vdDpacUFEZWNYc3czMTJAKG15c3FsOjMzMDYpL2NvbnNvbGU/Y2hhcnNldD11dGY4JnBhcnNlVGltZT1UcnVlJmxvYz1Mb2NhbA=="
-  mqUri: "YW1xcDovL2d1ZXN0Omd1ZXN0QHJhYmJpdG1xLWhhLmNvbnNvbGUuc3ZjLmNsdXN0ZXIubG9jYWw6NTY3Mg=="
+  mqUri: "YW1xcDovL3VzZXI6Skpveld2d0pDM0ByYWJiaXRtcS5jb25zb2xlLnN2Yy5jbHVzdGVyLmxvY2FsOjU2NzI="
   clientSecret: "c2VjcmV0"
   sentryDsn: ""
