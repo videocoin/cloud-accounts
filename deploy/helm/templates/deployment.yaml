@@ -17,19 +17,25 @@ spec:
       labels:
         app: {{ .Release.Name }}
     spec:
+    {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+      serviceAccountName: {{ .Values.serviceAccount.name }}
+      automountServiceAccountToken: true
       containers:
         - name: {{ .Release.Name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
-            - containerPort: {{ .Values.service.internalRpcPort }}
+            - containerPort: {{ .Values.service.ports.grpc }}
           readinessProbe:
             exec:
-              command: ["/bin/grpc_health_probe", "-addr=:{{ .Values.service.internalRpcPort }}"]
+              command: ["/bin/grpc_health_probe", "-addr=:{{ .Values.service.ports.grpc }}"]
             initialDelaySeconds: 5
           livenessProbe:
             exec:
-              command: ["/bin/grpc_health_probe", "-addr=:{{ .Values.service.internalRpcPort }}"]
+              command: ["/bin/grpc_health_probe", "-addr=:{{ .Values.service.ports.grpc }}"]
             initialDelaySeconds: 10
           env:
             - name: JAEGER_AGENT_HOST
@@ -39,7 +45,7 @@ spec:
             - name: JAEGER_AGENT_PORT
               value: "6831"
             - name: RPC_ADDR
-              value: 0.0.0.0:{{ .Values.service.internalRpcPort }}
+              value: 0.0.0.0:{{ .Values.service.ports.grpc }}
             - name: DBURI
               valueFrom:
                 secretKeyRef:
@@ -71,5 +77,7 @@ spec:
         - name: secrets
           secret:
             secretName: {{ .Release.Name }}
+    {{- with .Values.nodeSelector }}
       nodeSelector:
-        cloud.google.com/gke-nodepool: api
+        {{- toYaml . | nindent 8 }}
+    {{- end }}

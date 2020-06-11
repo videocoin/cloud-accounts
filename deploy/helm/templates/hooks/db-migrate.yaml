@@ -8,7 +8,7 @@ metadata:
     chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
     heritage: {{ .Release.Service }}
   annotations:
-    "helm.sh/hook": post-install,pre-upgrade
+    "helm.sh/hook": pre-install,pre-upgrade
     "helm.sh/hook-weight": "1"
     "helm.sh/hook-delete-policy": hook-succeeded
 spec:
@@ -36,14 +36,4 @@ spec:
           - "up"
         env:
           - name: DBURI
-            valueFrom:
-              secretKeyRef:
-                name: {{ .Chart.Name }}
-                key: dbUri
-      volumes:
-        - name: config
-          configMap:
-            name: {{ .Release.Name }}
-        - name: secrets
-          secret:
-            secretName: {{ .Release.Name }}
+            value: {{ .Values.secrets.dbUri | b64dec }}

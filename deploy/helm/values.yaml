@@ -1,21 +1,25 @@
-replicasCount: 3
+replicasCount: 1
 maxUnavailableCount: 0
 
 image:
-  repository: gcr.io/videocoin-network/accounts
+  repository: registry.videocoin.net/cloud/accounts
   tag: latest
   pullPolicy: Always
+  pullSecrets: 
+  - name: regcred
+
+serviceAccount:
+  name: default
 
 config: {}
 
 service:
-  type: ClusterIP
-  externalRpcPort: 5001
-  internalRpcPort: 5001
+  ports:
+    grpc: 5001
 
 autoscaler:
   minCount: 1
-  maxCount: 10
+  maxCount: 3
   targets:
     targetCPUUtilizationPercentage: 70
 
@@ -28,8 +32,7 @@ resources:
    memory: 1000Mi
 
 secrets:
-  dbUri: ""
-  mqUri: ""
-  clientSecret: ""
+  dbUri: "cm9vdDpacUFEZWNYc3czMTJAKG15c3FsOjMzMDYpL2NvbnNvbGU/Y2hhcnNldD11dGY4JnBhcnNlVGltZT1UcnVlJmxvYz1Mb2NhbA=="
+  mqUri: "YW1xcDovL2d1ZXN0Omd1ZXN0QHJhYmJpdG1xLWhhLmNvbnNvbGUuc3ZjLmNsdXN0ZXIubG9jYWw6NTY3Mg=="
+  clientSecret: "c2VjcmV0"
   sentryDsn: ""
-
