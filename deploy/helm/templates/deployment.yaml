@@ -16,6 +16,10 @@ spec:
       name: {{ .Release.Name }}
       labels:
         app: {{ .Release.Name }}
+    {{- with .Values.annotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
     spec:
     {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
@@ -27,6 +31,7 @@ spec:
         - name: {{ .Release.Name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: ["bash", "-c", "source /vault/secrets/common && source /vault/secrets/config && /goose -dir /migrations -table accounts mysql $DBURI up && /accounts"]
           ports:
             - containerPort: {{ .Values.service.ports.grpc }}
           readinessProbe:
@@ -46,37 +51,10 @@ spec:
               value: "6831"
             - name: RPC_ADDR
               value: 0.0.0.0:{{ .Values.service.ports.grpc }}
-            - name: DBURI
-              valueFrom:
-                secretKeyRef:
-                  name: {{ .Chart.Name }}
-                  key: dbUri
-            - name: MQURI
-              valueFrom:
-                secretKeyRef:
-                  name: {{ .Chart.Name }}
-                  key: mqUri
-            - name: CLIENT_SECRET
-              valueFrom:
-                secretKeyRef:
-                  name: {{ .Chart.Name }}
-                  key: clientSecret
-            - name: SENTRY_DSN
-              valueFrom:
-                secretKeyRef:
-                  name: {{ .Chart.Name }}
-                  key: sentryDsn
           {{- if .Values.resources }}
           resources:
 {{ toYaml .Values.resources | indent 12 }}
           {{- end }}
-      volumes:
-        - name: config
-          configMap:
-            name: {{ .Release.Name }}
-        - name: secrets
-          secret:
-            secretName: {{ .Release.Name }}
     {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

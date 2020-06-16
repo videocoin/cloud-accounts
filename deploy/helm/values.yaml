@@ -31,8 +31,16 @@ resources:
    cpu: 400m
    memory: 1000Mi
 
-secrets:
-  dbUri: "cm9vdDpacUFEZWNYc3czMTJAKG15c3FsOjMzMDYpL2NvbnNvbGU/Y2hhcnNldD11dGY4JnBhcnNlVGltZT1UcnVlJmxvYz1Mb2NhbA=="
-  mqUri: "YW1xcDovL3VzZXI6Skpveld2d0pDM0ByYWJiaXRtcS5jb25zb2xlLnN2Yy5jbHVzdGVyLmxvY2FsOjU2NzI="
-  clientSecret: "c2VjcmV0"
-  sentryDsn: ""
+annotations:
+  vault.hashicorp.com/agent-inject: "true"
+  vault.hashicorp.com/role: "console-accounts"
+  vault.hashicorp.com/agent-inject-secret-common: "videocoin/v1/networks/everest-dev/console/common"
+  vault.hashicorp.com/agent-inject-secret-config: "videocoin/v1/networks/everest-dev/console/accounts"
+  vault.hashicorp.com/agent-inject-template-common: |
+    {{ with secret "videocoin/v1/networks/everest-dev/console/common" }}{{ range $k, $v := .Data }}
+    export {{ $k }}="{{ $v }}"
+    {{ end }}{{ end }}
+  vault.hashicorp.com/agent-inject-template-config: |
+    {{ with secret "videocoin/v1/networks/everest-dev/console/accounts" }}{{ range $k, $v := .Data }}
+    export {{ $k }}="{{ $v }}"
+    {{ end }}{{ end }}
