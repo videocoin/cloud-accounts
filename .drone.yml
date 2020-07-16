@@ -49,6 +49,17 @@ steps:
       repo: registry.videocoin.net/cloud/accounts
       tags:
         - ${DRONE_TAG}
+  - name: deploy
+    image: devth/helm:v3.1.1
+    environment:
+      KUBE_CONFIG:
+        from_secret: stage_kube_config
+    commands:
+      - echo $KUBE_CONFIG | base64 -d > kube.config
+      - helm --kubeconfig=kube.config upgrade -i --wait --set image.tag=$DRONE_TAG -n console accounts ./deploy/helm
+    when:
+      branch:
+      - master
 trigger:
   event:
     - push
@@ -56,3 +67,4 @@ trigger:
   branch:
     - pe-1
     - pe-2
+    - master
