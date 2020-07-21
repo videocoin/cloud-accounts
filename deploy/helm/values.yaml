@@ -4,7 +4,7 @@ maxUnavailableCount: 0
 image:
   repository: registry.videocoin.net/cloud/accounts
   tag: latest
-  pullPolicy: Always
+  pullPolicy: IfNotPresent
   pullSecrets: 
   - name: regcred
 
