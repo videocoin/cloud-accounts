@@ -1,7 +1,0 @@
-FROM golang:1.14
-
-MAINTAINER VideoCoin
-
-WORKDIR /go/src/github.com/videocoin/cloud-accounts
-
-CMD go run cmd/main.go
